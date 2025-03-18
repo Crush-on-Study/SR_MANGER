@@ -1,49 +1,3 @@
-<script setup>
-import { ref, defineEmits } from 'vue';
-import Button from './Button.vue';
-
-const emit = defineEmits(['close', 'create']);
-
-const newListName = ref('');
-const newListDescription = ref('');
-const applyingMonth = ref('');
-const iccHours = ref('');
-const ekmtcHours = ref('');
-const rpaHours = ref('');
-
-const createNewList = () => {
-  if (!newListName.value.trim()) {
-    alert("Name은 필수 입력 사항입니다!");
-    return;
-  }
-
-  const newItem = {
-    name: newListName.value,
-    description: newListDescription.value,
-    month: applyingMonth.value,
-    icc: iccHours.value,
-    ekmtc: ekmtcHours.value,
-    rpa: rpaHours.value,
-  };
-
-  console.log("📌 [Modal2.vue] createNewList 실행됨", newItem);
-
-  // ✅ Development.vue로 데이터 전달
-  emit('create', newItem);
-  emit('close');
-
-  console.log("✅ [Modal2.vue] addNewItem 이벤트 발생", newItem);
-
-  // 입력값 초기화
-  newListName.value = '';
-  newListDescription.value = '';
-  applyingMonth.value = '';
-  iccHours.value = '';
-  ekmtcHours.value = '';
-  rpaHours.value = '';
-};
-</script>
-
 <template>
     <div class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-content">
@@ -89,6 +43,52 @@ const createNewList = () => {
       </div>
     </div>
   </template>
+
+<script setup>
+import { ref, defineEmits } from 'vue';
+import Button from './Button.vue';
+
+const emit = defineEmits(['close', 'create']);
+
+const newListName = ref('');
+const newListDescription = ref('');
+const applyingMonth = ref('');
+const iccHours = ref('');
+const ekmtcHours = ref('');
+const rpaHours = ref('');
+
+const createNewList = () => {
+  if (!newListName.value.trim()) {
+    alert("Name은 필수 입력 사항입니다!");
+    return;
+  }
+
+  const newItem = {
+    name: newListName.value,
+    description: newListDescription.value,
+    month: applyingMonth.value,
+    icc: iccHours.value,
+    ekmtc: ekmtcHours.value,
+    rpa: rpaHours.value,
+  };
+
+  console.log("📌 [Modal2.vue] createNewList 실행됨", newItem);
+
+  // ✅ Development.vue로 데이터 전달
+  emit('create', newItem);
+  emit('close');
+
+  console.log("✅ [Modal2.vue] addNewItem 이벤트 발생", newItem);
+
+  // 입력값 초기화
+  newListName.value = '';
+  newListDescription.value = '';
+  applyingMonth.value = '';
+  iccHours.value = '';
+  ekmtcHours.value = '';
+  rpaHours.value = '';
+};
+</script>
   
   <style scoped>
   /* ✅ 모달 기본 스타일 */

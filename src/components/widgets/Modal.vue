@@ -1,40 +1,3 @@
-<script setup>
-import { ref, defineProps, defineEmits } from 'vue';
-import Button from './Button.vue';
-
-const props = defineProps({
-  nameList: Array, // ✅ App.vue에서 전달받음
-});
-
-const emit = defineEmits(['addNewItem']);
-
-const isNewListModalOpen = ref(false);
-const newListName = ref('');
-const newListDescription = ref('');
-const checkedItems = ref([]); // ✅ 체크된 항목 저장
-
-const createNewList = () => {
-  if (!newListName.value.trim()) {
-    alert("Name은 필수 입력 사항입니다!");
-    return;
-  }
-
-  const newItem = { name: newListName.value, description: newListDescription.value };
-
-  console.log("📌 [Modal.vue] createNewList 실행됨", newItem);
-  
-  // ✅ 새로운 목록을 App.vue에 전달 (전역 관리)
-  emit('addNewItem', newItem);
-
-  console.log("✅ [Modal.vue] addNewItem 이벤트 발생", newItem);
-
-  // 입력값 초기화 및 모달 닫기
-  newListName.value = '';
-  newListDescription.value = '';
-  isNewListModalOpen.value = false;
-};
-</script>
-
 <template>
   <div class="modal-overlay" @click.self="$emit('close')">
     <div class="modal-content">
@@ -78,6 +41,43 @@ const createNewList = () => {
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref, defineProps, defineEmits } from 'vue';
+import Button from './Button.vue';
+
+const isNewListModalOpen = ref(false);
+const newListName = ref('');
+const newListDescription = ref('');
+const checkedItems = ref([]); // ✅ 체크된 항목 저장
+
+const props = defineProps({
+  nameList: Array, // ✅ App.vue에서 전달받음
+});
+
+const emit = defineEmits(['addNewItem']);
+
+const createNewList = () => {
+  if (!newListName.value.trim()) {
+    alert("Name은 필수 입력 사항입니다!");
+    return;
+  }
+
+  const newItem = { name: newListName.value, description: newListDescription.value };
+
+  console.log("📌 [Modal.vue] createNewList 실행됨", newItem);
+  
+  // ✅ 새로운 목록을 App.vue에 전달 (전역 관리)
+  emit('addNewItem', newItem);
+
+  console.log("✅ [Modal.vue] addNewItem 이벤트 발생", newItem);
+
+  // 입력값 초기화 및 모달 닫기
+  newListName.value = '';
+  newListDescription.value = '';
+  isNewListModalOpen.value = false;
+};
+</script>
 
 <style scoped>
 .modal-overlay {

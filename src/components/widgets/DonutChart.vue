@@ -9,15 +9,20 @@
   <script setup>
   import { ref, onMounted, watch } from 'vue';
   import Chart from 'chart.js/auto';
+
+  const chartCanvas = ref(null);
+  const totalHours = ref(0);
+  let chartInstance = null;
   
+  onMounted(() => {
+    updateChart();
+  });
+  
+  watch(() => props.serviceData, updateChart, { deep: true });
+
   const props = defineProps({
     serviceData: Object, // { ICC: 40, 'E-KMTC': 30, RPA: 30 }
   });
-  
-  const chartCanvas = ref(null);
-  let chartInstance = null;
-  
-  const totalHours = ref(0);
   
   const updateChart = () => {
     if (chartInstance) {
@@ -49,12 +54,6 @@
       },
     });
   };
-  
-  onMounted(() => {
-    updateChart();
-  });
-  
-  watch(() => props.serviceData, updateChart, { deep: true });
   </script>
   
   <style scoped>

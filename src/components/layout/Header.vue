@@ -1,14 +1,3 @@
-<script setup>
-import { useRouter } from 'vue-router';
-import Button from '../widgets/Button.vue';
-
-const router = useRouter();
-
-const logout = () => {
-  router.push('/');
-};
-</script>
-
 <template>
   <header class="header">
     <div class="left">
@@ -20,6 +9,17 @@ const logout = () => {
     </div>
   </header>
 </template>
+
+<script setup>
+import { useRouter } from 'vue-router';
+import Button from '../widgets/Button.vue';
+
+const router = useRouter();
+
+const logout = () => {
+  router.push('/');
+};
+</script>
 
 <style scoped>
 .header {
