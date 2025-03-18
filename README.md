@@ -1,5 +1,30 @@
-# Vue 3 + Vite
+# 🚀 KMTC SR Management Service
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+> **서비스 개요**  
+> Vue3 기반의 SR(서비스 요청) 관리 시스템으로, 우선순위 SR과 일반 SR을 효율적으로 관리할 수 있습니다.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+---
+
+## 📖 프로젝트 개요
+### ✅ **기능**  (사진은 추가 예정)
+- 📌 **우선순위 S/R 관리 (Priority.vue)**
+  - 도메인, 상태, 서비스 타입 등의 필터 기능 제공
+  - 체크된 항목을 기준으로 총 공수 시간 계산
+  - SR 요청별 도넛 차트를 통해 서비스 비율 시각화
+
+- 📌 **일반 S/R 관리 (General.vue)**
+  - SR 요청 목록을 테이블 형태로 제공
+  - 중요도 필터링 및 검색 기능 추가
+  - 총 공수 시간 계산 기능 적용
+
+- 📌 **개발 대상 목록 (Development.vue)**
+  - SR 요청별 상세 정보를 카드 형태로 제공
+  - **서비스 유형 비율**을 도넛 차트로 시각화
+  - "필수 개발 대상" 개수 및 총 공수 시간 계산 기능 추가
+
+- 📌 **상세 페이지 (Detail.vue)**
+  - Development.vue에서 선택한 목록을 props로 전달받아 세부 정보 제공
+  - ICC, RPA, E-KMTC 서비스 타입별 총 공수 시간 자동 계산
+  - 특정 항목을 제외하면 서비스 타입별 분류 적용
+
+---
