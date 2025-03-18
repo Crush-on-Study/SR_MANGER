@@ -32,8 +32,8 @@ const closeModal2 = () => { isModal2Open.value = false; };
 <template>
   <div class="development-container">
     <div class="header">
-      <h2>{{ selectedItem.name }} 목록 리스트</h2>  <!-- ✅ 제목 변경됨 -->
-      <Button label="+ NEW" type="primary" @click="isModal2Open = true" />
+      <h2> S/R 요청 카드 리스트</h2>  <!-- ✅ 제목 변경됨 -->
+      <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
     </div>
 
     <!-- ✅ 리스트 출력 -->
@@ -62,6 +62,7 @@ const closeModal2 = () => { isModal2Open.value = false; };
 .development-container {
   padding: 20px;
 }
+
 
 .list-container {
   display: flex;

@@ -24,30 +24,44 @@ const logout = () => {
 <style scoped>
 .header {
   display: flex;
+  width: calc(100% - 230px);;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background: #3498db;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2980b9, #6dd5fa);
   color: white;
-  height: 40px; /* 헤더 높이 유지 */
+  height: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
 }
 
 .left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .menu-btn {
-  font-size: 20px;
+  font-size: 24px;
   background: none;
   border: none;
   color: white;
   cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.menu-btn:hover {
+  transform: scale(1.1);
 }
 
 .right {
   display: flex;
   align-items: center;
+}
+
+h1 {
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 </style>

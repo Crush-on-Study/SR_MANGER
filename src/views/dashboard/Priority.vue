@@ -57,8 +57,8 @@
                   <option>N</option>
                 </select>
               </td>
-              <td><input type="number" v-model="item.priority" min="1" /></td>
-              <td class="month-label">{{ new Date(item.requestDate).getMonth() + 1 }}월</td>
+              <td><input type="number" v-model="item.priority" min="1" class="priority-input" /></td>
+              <td><MonthCard :month="(new Date(item.requestDate).getMonth() + 1) + '월'" /></td>
             </tr>
           </tbody>
         </table>
@@ -81,6 +81,7 @@
   import Button from '../../components/widgets/Button.vue';
   import Modal from '../../components/widgets/Modal.vue';
   import StatusCard from '../../components/widgets/StatusCard.vue';
+  import MonthCard from '../../components/widgets/MonthCard.vue';
   
   const props = defineProps({
     nameList: Array,  // ✅ App.vue에서 nameList를 받아옴
@@ -187,6 +188,17 @@
   th {
     background: #f1f1f1;
   }
+
+  /* ✅ 우선순위 입력 필드 크기 조정 */
+    .priority-input {
+    width: 50px; /* 입력 필드 길이 줄임 */
+    padding: 4px 6px;
+    text-align: center; /* 숫자 중앙 정렬 */
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f9f9f9;
+    }
 
   .button-container {
   display: flex;

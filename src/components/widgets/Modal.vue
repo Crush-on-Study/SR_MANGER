@@ -11,6 +11,7 @@ const emit = defineEmits(['addNewItem']);
 const isNewListModalOpen = ref(false);
 const newListName = ref('');
 const newListDescription = ref('');
+const checkedItems = ref([]); // ✅ 체크된 항목 저장
 
 const createNewList = () => {
   if (!newListName.value.trim()) {
@@ -39,7 +40,7 @@ const createNewList = () => {
     <div class="modal-content">
       <h3>개발 목록에 추가</h3>
 
-      <!-- ✅ 체크리스트 (기존 목록 + 추가된 목록) -->
+      <!-- ✅ 체크리스트 (세로 정렬) -->
       <div class="checkbox-list">
         <label v-for="(item, index) in nameList" :key="index" class="checkbox-item">
           <input type="checkbox" v-model="checkedItems" :value="item.name" />
@@ -78,7 +79,6 @@ const createNewList = () => {
   </div>
 </template>
 
-
 <style scoped>
 .modal-overlay {
   position: fixed;
@@ -98,6 +98,22 @@ const createNewList = () => {
   border-radius: 10px;
   width: 300px;
   position: relative;
+}
+
+/* ✅ 체크리스트 세로 정렬 */
+.checkbox-list {
+  display: flex;
+  flex-direction: column; /* 세로 정렬 */
+  gap: 10px; /* 체크박스 간 간격 */
+  margin: 15px 0;
+}
+
+/* ✅ 개별 체크박스 스타일 */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
 }
 
 .form-group {
