@@ -1,6 +1,11 @@
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 
+const props = defineProps({
+  tabs: Array
+});
+
+
 const router = useRouter();
 const route = useRoute();
 
@@ -22,18 +27,9 @@ const navigate = (path) => {
     </div>
 
     <ul class="menu-list">
-      <li :class="{ active: route.path === '/priority' }" @click="navigate('/priority')">
-        <span class="icon">📌</span> <span class="menu-text">우선순위 대상</span>
-      </li>
-      <li :class="{ active: route.path === '/general' }" @click="navigate('/general')">
-        <span class="icon">📋</span> <span class="menu-text">일반 SR</span>
-      </li>
-      <li :class="{ active: route.path === '/development' }" @click="navigate('/development')">
-        <span class="icon">🛠️</span> <span class="menu-text">월별 개발 대상</span>
-      </li>
-      <li :class="{ active: route.path === '/stats' }" @click="navigate('/stats')">
-        <span class="icon">📊</span> <span class="menu-text">분석 통계</span>
-      </li>
+        <li v-for="tab in tabs" :key="tab" :class="{ active: route.path === `${tab.path}` }" @click="navigate(`${tab.path}`)">
+          <span class="icon">{{ tab.icon }}</span> <span class="menu-text">{{ tab.text }}</span>
+        </li>
     </ul>
   </nav>
 </template>

@@ -5,7 +5,10 @@
   
       <div class="content-wrapper">
         <!-- ✅ 사이드바 (왼쪽 고정) -->
-        <Sidebar v-if="route.path !== '/'" />
+        <Sidebar 
+          v-if="route.path !== '/'" 
+          :tabs="tabs"
+        />
   
         <!-- ✅ 메인 컨텐츠 (남은 공간 차지) -->
         <div class="main-content">
@@ -20,7 +23,15 @@
   import { RouterView, useRoute } from 'vue-router';
   import Header from './components/layout/Header.vue';
   import Sidebar from './components/layout/Sidebar.vue';
-  
+
+  // !Remark 추후 DATA 따로 빼서 관리
+  const tabs = ref([
+    {path: '/priority', icon: '📌', text: '우선순위 대상'},
+    {path: '/general', icon: '📋', text: '일반 SR'},
+    {path: '/development', icon: '🛠️', text: '월별 개발 대상'},
+    {path: '/stats', icon: '📊', text: '분석 통계'},
+  ]);
+
   const route = useRoute();
   
   const nameList = ref([
