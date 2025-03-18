@@ -1,3 +1,4 @@
+// ✅ App.vue (전역 nameList 관리)
 <script setup>
 import { ref } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
@@ -7,15 +8,17 @@ import Sidebar from './components/layout/Sidebar.vue';
 const route = useRoute();
 
 // ✅ 전역적으로 관리할 nameList
-const nameList = ref([]);
+const nameList = ref([
+  { id: '2501', name: '25.01', description: '25년도 1월 개발 대상 목록 입니다.' },
+  { id: '2503', name: '25.03(후보)', description: '25년도 3월 개발 대상 후보 목록 입니다.' },
+  { id: '2504', name: '25.04(후보)', description: '25년도 4월 개발 대상 후보 목록 입니다.' }
+]);
 
-// ✅ 새로운 목록 추가 함수 (이벤트를 통해 호출됨)
+// ✅ 새로운 목록 추가 함수
 const addNewItem = (newItem) => {
-  console.log("📌 [App.vue] addNewItem 호출됨", newItem);
+  console.log('📌 [App.vue] addNewItem 호출됨', newItem);
   nameList.value.push(newItem);
-  console.log("✅ [App.vue] nameList 업데이트됨", nameList.value);
 };
-
 </script>
 
 <template>

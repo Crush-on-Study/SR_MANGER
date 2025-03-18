@@ -1,9 +1,24 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import Button from '../../components/widgets/Button.vue';
 
+// ✅ 현재 라우터 정보 가져오기
+const route = useRoute();
+
+// ✅ 기존 개발 대상 리스트 (Development.vue와 동일)
+const nameList = ref([
+  { id: "2501", name: "25.01", description: "25년도 1월 개발 대상 목록 입니다." },
+  { id: "2503", name: "25.03(후보)", description: "25년도 3월 개발 대상 후보 목록 입니다." },
+  { id: "2504", name: "25.04(후보)", description: "25년도 4월 개발 대상 후보 목록 입니다." },
+]);
+
+// ✅ 현재 선택한 개발 대상 찾기
+const selectedItem = computed(() => {
+  return nameList.value.find(item => item.id === route.params.id) || { name: "목록 없음" };
+});
+
 // ✅ 첫 번째 메인 테이블 데이터 (기본 리스트)
-// ✅ 상세 페이지에 표시할 테이블 데이터 (임시 데이터)
 const mainTableData = ref([
   { id: 481384, title: "ICC 분석", domain: "CM", serviceType: "ICC", requestDate: "2024.12.31", estimatedHours: 170, importance: "필수 개발 대상" },
   { id: 15346, title: "Audinga API 연경", domain: "CM", serviceType: "API", requestDate: "2025.02.09", estimatedHours: 58, importance: "긴급 중요도 상" },
@@ -38,7 +53,8 @@ const restoreItem = (serviceType, index) => {
 
 <template>
   <div class="detail-container">
-    <h2>개발 목록 리스트</h2>
+    <!-- ✅ 제목 변경: 선택한 개발 대상의 이름을 출력 -->
+    <h2>{{ selectedItem.name }} 개발 목록 리스트</h2>
     
     <!-- ✅ 첫 번째 테이블 (메인 리스트) -->
     <table class="main-table">
