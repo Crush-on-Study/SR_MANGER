@@ -6,7 +6,8 @@ import Button from "../widgets/Button.vue"; // ✅ Button.vue 컴포넌트 활�
 const props = defineProps({
   domainOptions: Array,
   statusOptions: Array,
-  serviceTypeOptions: Array
+  serviceTypeOptions: Array,
+  importanceOptions: Array // 얘는 Priority에서 안데려오도록 할거임.
 });
 
 // ✅ 검색 필터 상태
@@ -17,7 +18,7 @@ const filters = ref({
   domain: "ALL",
   status: "All",
   serviceType: "All",
-  importance: "비긴급"
+  importance: props.importanceOptions ? "비긴급" : "" // ✅ 중요도 필터가 없으면 빈 값 유지
 });
 
 // ✅ 검색 이벤트 발생
@@ -72,12 +73,11 @@ const handleSearch = () => {
       </select>
     </div>
 
-    <!-- ✅ 중요도 필터 -->
-    <div class="filter-group">
+    <!-- ✅ 중요도 필터 (필요한 경우에만 렌더링) -->
+    <div v-if="props.importanceOptions" class="filter-group">
       <label>Importance</label>
       <select v-model="filters.importance" class="search-input">
-        <option>비긴급</option>
-        <option>긴급</option>
+        <option v-for="option in props.importanceOptions" :key="option" :value="option">{{ option }}</option>
       </select>
     </div>
 
