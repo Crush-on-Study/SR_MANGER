@@ -1,3 +1,91 @@
+<template>
+  <div class="general-container">
+    <!-- 필터 바 -->
+    <div class="filter-header">
+      <h2>일반 SR</h2>
+    </div>
+
+    <SearchBar class="searchbar"
+      :domainOptions="['CC', 'CS', 'SO', 'VO']"
+      :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
+      :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
+      :importanceOptions="[
+        '비긴급 - 중요도 하', 
+        '비긴급 - 중요도 상', 
+        '긴급 - 중요도 하', 
+        '긴급 - 중요도 상', 
+        '필수 개발 대상', 
+        '미지정'
+      ]"
+      @search="handleSearch"
+    />
+
+    <!-- ✅ 개발 대상 추가 버튼 -->
+    <div class="button-container">
+      <Button 
+        label="+ 개발 대상 추가" 
+        type="primary" 
+        :disabled="!isAnyChecked"
+        @click="openModal" 
+      />
+    </div>
+
+    <!-- ✅ 테이블 -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" v-model="allChecked" @change="toggleAll" /></th>
+            <th>Ref.no</th>
+            <th>Domain</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Service Type</th>
+            <th>Request Date</th>
+            <th>Estimated Hours</th>
+            <th>중요도</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr 
+                v-for="(item) in filteredItems" 
+                :key="item.id"
+                :class="{ 'highlight-mandatory': item.importance === '필수 개발 대상' }"
+            >
+                <td><input type="checkbox" v-model="item.isChecked" /></td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.domain }}</td>
+                <td>{{ item.title }}</td>
+                <td><StatusCard :status="item.status" /></td>
+                <td>{{ item.serviceType }}</td>
+                <td>{{ item.requestDate }}</td>
+                <td>{{ item.estimatedHours }}</td>
+                <td>{{ item.importance }}</td>
+            </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- ✅ 도메인별 Total Hours + 전체 Total -->
+    <div class="total-summary">
+      <span class="total-item total-highlight">Total: {{ totalHours }} hours</span> |
+      <span v-for="(hours, domain) in totalHoursByDomain" :key="domain" class="total-item">
+        {{ domain }}: {{ hours }} hours
+      </span>
+    </div>
+
+    <!-- ✅ 모달 추가 -->
+    <Modal 
+      v-if="isModalOpen" 
+      title="개발 목록에 추가" 
+      :nameList="nameList" 
+      @close="isModalOpen = false" 
+      @addNewItem="addNewItem" 
+    />
+  </div>
+</template>
+
 <script setup>
 import { ref, computed, defineProps, defineEmits } from 'vue';
 import SearchBar from '../../components/widgets/SearchBar.vue';
@@ -105,94 +193,6 @@ const handleSearch = (searchFilters) => {
   filters.value = searchFilters;
 };
 </script>
-
-<template>
-  <div class="general-container">
-    <!-- 필터 바 -->
-    <div class="filter-header">
-      <h2>일반 SR</h2>
-    </div>
-
-    <SearchBar class="searchbar"
-      :domainOptions="['CC', 'CS', 'SO', 'VO']"
-      :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
-      :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
-      :importanceOptions="[
-        '비긴급 - 중요도 하', 
-        '비긴급 - 중요도 상', 
-        '긴급 - 중요도 하', 
-        '긴급 - 중요도 상', 
-        '필수 개발 대상', 
-        '미지정'
-      ]"
-      @search="handleSearch"
-    />
-
-    <!-- ✅ 개발 대상 추가 버튼 -->
-    <div class="button-container">
-      <Button 
-        label="+ 개발 대상 추가" 
-        type="primary" 
-        :disabled="!isAnyChecked"
-        @click="openModal" 
-      />
-    </div>
-
-    <!-- ✅ 테이블 -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th><input type="checkbox" v-model="allChecked" @change="toggleAll" /></th>
-            <th>Ref.no</th>
-            <th>Domain</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Service Type</th>
-            <th>Request Date</th>
-            <th>Estimated Hours</th>
-            <th>중요도</th>
-          </tr>
-        </thead>
-        <tbody>
-            <tr 
-                v-for="(item) in filteredItems" 
-                :key="item.id"
-                :class="{ 'highlight-mandatory': item.importance === '필수 개발 대상' }"
-            >
-                <td><input type="checkbox" v-model="item.isChecked" /></td>
-                <td>{{ item.id }}</td>
-                <td>{{ item.domain }}</td>
-                <td>{{ item.title }}</td>
-                <td><StatusCard :status="item.status" /></td>
-                <td>{{ item.serviceType }}</td>
-                <td>{{ item.requestDate }}</td>
-                <td>{{ item.estimatedHours }}</td>
-                <td>{{ item.importance }}</td>
-            </tr>
-        </tbody>
-
-      </table>
-    </div>
-
-    <!-- ✅ 도메인별 Total Hours + 전체 Total -->
-    <div class="total-summary">
-      <span class="total-item total-highlight">Total: {{ totalHours }} hours</span> |
-      <span v-for="(hours, domain) in totalHoursByDomain" :key="domain" class="total-item">
-        {{ domain }}: {{ hours }} hours
-      </span>
-    </div>
-
-    <!-- ✅ 모달 추가 -->
-    <Modal 
-      v-if="isModalOpen" 
-      title="개발 목록에 추가" 
-      :nameList="nameList" 
-      @close="isModalOpen = false" 
-      @addNewItem="addNewItem" 
-    />
-  </div>
-</template>
 
 <style scoped>
 .general-container {

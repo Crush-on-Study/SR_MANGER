@@ -1,33 +1,3 @@
-<script setup>
-import { ref, defineEmits, defineProps } from "vue";
-import Button from "../widgets/Button.vue"; // ✅ Button.vue 컴포넌트 활용
-
-// ✅ 부모 컴포넌트에서 필터 옵션을 받을 수 있도록 설정
-const props = defineProps({
-  domainOptions: Array,
-  statusOptions: Array,
-  serviceTypeOptions: Array,
-  importanceOptions: Array // 얘는 Priority에서 안데려오도록 할거임.
-});
-
-// ✅ 검색 필터 상태
-const filters = ref({
-  searchText: "",
-  fromDate: "",
-  toDate: "",
-  domain: "ALL",
-  status: "All",
-  serviceType: "All",
-  importance: props.importanceOptions ? "비긴급" : "" // ✅ 중요도 필터가 없으면 빈 값 유지
-});
-
-// ✅ 검색 이벤트 발생
-const emit = defineEmits(["search"]);
-const handleSearch = () => {
-  emit("search", filters.value);
-};
-</script>
-
 <template>
   <div class="search-bar">
     <!-- ✅ Reference No -->
@@ -85,6 +55,36 @@ const handleSearch = () => {
     <Button label="Search" type="primary" @click="handleSearch" />
   </div>
 </template>
+
+<script setup>
+import { ref, defineEmits, defineProps } from "vue";
+import Button from "../widgets/Button.vue"; // ✅ Button.vue 컴포넌트 활용
+
+// ✅ 부모 컴포넌트에서 필터 옵션을 받을 수 있도록 설정
+const props = defineProps({
+  domainOptions: Array,
+  statusOptions: Array,
+  serviceTypeOptions: Array,
+  importanceOptions: Array // 얘는 Priority에서 안데려오도록 할거임.
+});
+
+// ✅ 검색 필터 상태
+const filters = ref({
+  searchText: "",
+  fromDate: "",
+  toDate: "",
+  domain: "ALL",
+  status: "All",
+  serviceType: "All",
+  importance: props.importanceOptions ? "비긴급" : "" // ✅ 중요도 필터가 없으면 빈 값 유지
+});
+
+// ✅ 검색 이벤트 발생
+const emit = defineEmits(["search"]);
+const handleSearch = () => {
+  emit("search", filters.value);
+};
+</script>
 
 <style scoped>
 /* ✅ 전체 검색 바 */

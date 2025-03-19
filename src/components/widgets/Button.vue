@@ -1,3 +1,9 @@
+<template>
+  <button :class="['btn', type, { full: fullWidth }]">
+    {{ label }}
+  </button>
+</template>
+
 <script setup>
 import { defineProps } from 'vue';
 
@@ -13,12 +19,6 @@ const props = defineProps({
   }
 });
 </script>
-
-<template>
-  <button :class="['btn', type, { full: fullWidth }]">
-    {{ label }}
-  </button>
-</template>
 
 <style scoped>
 /* 기본 버튼 스타일 */

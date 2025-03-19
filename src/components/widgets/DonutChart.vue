@@ -1,3 +1,9 @@
+<template>
+  <div class="donut-chart">
+    <Pie :data="chartData" :options="chartOptions" />
+  </div>
+</template>
+
 <script setup>
 import { defineProps, computed } from "vue";
 import { Pie } from "vue-chartjs";
@@ -31,11 +37,6 @@ const chartOptions = {
 };
 </script>
 
-<template>
-  <div class="donut-chart">
-    <Pie :data="chartData" :options="chartOptions" />
-  </div>
-</template>
 
 <style scoped>
 .donut-chart {

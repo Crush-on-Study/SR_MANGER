@@ -1,3 +1,100 @@
+<template>
+  <div class="priority-container">
+    <!-- 헤더 -->
+    <div class="filter-header">
+      <h2>우선순위 S/R 리스트</h2>
+    </div>
+
+    <SearchBar class="searchbar"
+      :domainOptions="['CC', 'CS', 'SO', 'SA', 'VO', 'ST']"
+      :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
+      :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
+      @search="handleSearch"
+    />
+
+    <!-- ✅ 개발 대상 추가 버튼 -->
+    <div class="button-container">
+      <Button 
+        label="+ 개발 대상 추가" 
+        type="primary" 
+        :disabled="!isAnyChecked"
+        @click="openModal" 
+      />
+    </div>
+
+    <!-- ✅ 테이블 -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" v-model="allChecked" @change="toggleAll" /></th>
+            <th>Ref.no</th>
+            <th>Domain</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Service Type</th>
+            <th>Request Date</th>
+            <th>Estimated Hours</th>
+            <th>필수 개발 대상</th>
+            <th>우선 순위</th>
+            <th>개발 Month</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item) in filteredItems" :key="item.id">
+            <td><input type="checkbox" v-model="item.isChecked" /></td>
+            <td>{{ item.id }}</td>
+            <td>{{ item.domain }}</td>
+            <td @click = "openDetailModal(item.id)" style="cursor:pointer;">{{ item.title }}</td>
+            <td><StatusCard :status="item.status" /></td>
+            <td>{{ item.serviceType }}</td>
+            <td>{{ item.requestDate }}</td>
+            <td>{{ item.estimatedHours }}</td>
+            <td>
+              <select v-model="item.mandatory">
+                <option>Y</option>
+                <option>N</option>
+              </select>
+            </td>
+            <td><input type="number" v-model="item.priority" min="1" class="priority-input" /></td>
+            <td><MonthCard :month="(new Date(item.requestDate).getMonth() + 1) + '월'" /></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ✅ 도메인별 Total Hours + 전체 Total -->
+    <div class="total-summary">
+      <span class="total-item total-highlight">Total: {{ totalHours }} hours</span> |
+      <span v-for="(hours, domain) in totalHoursByDomain" :key="domain" class="total-item">
+        {{ domain }}: {{ hours }} hours
+      </span>
+    </div>
+
+    <!-- 서비스 타입 -->
+    <div class="service-group">
+        <span v-for="(hours, type) in serviceHours" :key="type" class="total-item service-type">
+            {{ type }}: {{ hours }} hours
+        </span>
+    </div>
+
+    <!-- ✅ 모달 추가 -->
+    <Modal 
+      v-if="isModalOpen" 
+      title="개발 목록에 추가" 
+      :nameList="nameList" 
+      @close="isModalOpen = false" 
+      @addNewItem="addNewItem" 
+    />
+
+    <DetailModal 
+      v-if="isDetailModalOpen" 
+      :detailInfo="detailInfo" 
+      @close="isDetailModalOpen = false"
+    />
+  </div>
+</template>
+
 <script setup>
 import { ref, computed, defineProps, defineEmits } from 'vue';
 import SearchBar from '../../components/widgets/SearchBar.vue';
@@ -5,6 +102,11 @@ import Button from '../../components/widgets/Button.vue';
 import Modal from '../../components/widgets/Modal.vue';
 import StatusCard from '../../components/widgets/StatusCard.vue';
 import MonthCard from '../../components/widgets/MonthCard.vue';
+import commonData from '../../data/common.js';
+import DetailModal from '../../components/Modals/DetailModal.vue';
+  
+const itemtemp = commonData.requests;
+
 
 // ✅ Props & Events
 const props = defineProps({
@@ -13,6 +115,14 @@ const props = defineProps({
 const emit = defineEmits(['addNewItem']);
 
 const isModalOpen = ref(false);
+const isDetailModalOpen = ref(false);
+const detailInfo = ref({});
+
+const openDetailModal = (id) => {
+  const selectedIdDetails = itemtemp[0].find((item) => item.ref_no === id);
+  detailInfo.value = selectedIdDetails;
+  isDetailModalOpen.value = true;
+}
 
 // ✅ 필터 상태 추가
 const filters = ref({
@@ -107,96 +217,6 @@ const handleSearch = (searchFilters) => {
 };
 </script>
 
-<template>
-  <div class="priority-container">
-    <!-- 헤더 -->
-    <div class="filter-header">
-      <h2>우선순위 S/R 리스트</h2>
-    </div>
-
-    <SearchBar class="searchbar"
-      :domainOptions="['CC', 'CS', 'SO', 'SA', 'VO', 'ST']"
-      :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
-      :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
-      @search="handleSearch"
-    />
-
-    <!-- ✅ 개발 대상 추가 버튼 -->
-    <div class="button-container">
-      <Button 
-        label="+ 개발 대상 추가" 
-        type="primary" 
-        :disabled="!isAnyChecked"
-        @click="openModal" 
-      />
-    </div>
-
-    <!-- ✅ 테이블 -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th><input type="checkbox" v-model="allChecked" @change="toggleAll" /></th>
-            <th>Ref.no</th>
-            <th>Domain</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Service Type</th>
-            <th>Request Date</th>
-            <th>Estimated Hours</th>
-            <th>필수 개발 대상</th>
-            <th>우선 순위</th>
-            <th>개발 Month</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item) in filteredItems" :key="item.id">
-            <td><input type="checkbox" v-model="item.isChecked" /></td>
-            <td>{{ item.id }}</td>
-            <td>{{ item.domain }}</td>
-            <td>{{ item.title }}</td>
-            <td><StatusCard :status="item.status" /></td>
-            <td>{{ item.serviceType }}</td>
-            <td>{{ item.requestDate }}</td>
-            <td>{{ item.estimatedHours }}</td>
-            <td>
-              <select v-model="item.mandatory">
-                <option>Y</option>
-                <option>N</option>
-              </select>
-            </td>
-            <td><input type="number" v-model="item.priority" min="1" class="priority-input" /></td>
-            <td><MonthCard :month="(new Date(item.requestDate).getMonth() + 1) + '월'" /></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ✅ 도메인별 Total Hours + 전체 Total -->
-    <div class="total-summary">
-      <span class="total-item total-highlight">Total: {{ totalHours }} hours</span> |
-      <span v-for="(hours, domain) in totalHoursByDomain" :key="domain" class="total-item">
-        {{ domain }}: {{ hours }} hours
-      </span>
-    </div>
-
-    <!-- 서비스 타입 -->
-    <div class="service-group">
-        <span v-for="(hours, type) in serviceHours" :key="type" class="total-item service-type">
-            {{ type }}: {{ hours }} hours
-        </span>
-    </div>
-
-    <!-- ✅ 모달 추가 -->
-    <Modal 
-      v-if="isModalOpen" 
-      title="개발 목록에 추가" 
-      :nameList="nameList" 
-      @close="isModalOpen = false" 
-      @addNewItem="addNewItem" 
-    />
-  </div>
-</template>
 
 <style scoped>
 .priority-container {

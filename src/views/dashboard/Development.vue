@@ -1,3 +1,49 @@
+<template>
+  <div class="development-container">
+    <div class="header">
+      <h2> S/R 요청 카드 리스트</h2>
+    </div>
+
+    <div class="btn_new">
+        <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
+    </div>
+
+    <!-- ✅ 리스트 출력 -->
+    <div class="list-container">
+      <div 
+        v-for="(item, index) in nameList" 
+        :key="index" 
+        class="list-item" 
+        @click="$router.push(`/development/${item.id}`)"
+      >
+        <div class="content">
+          <h3>{{ item.name }}</h3>
+          <p>{{ item.description }}</p>
+        </div>
+
+        <!-- ✅ 도넛 차트 & 필수 개발 대상 요약 -->
+        <div class="chart-summary">
+          <DonutChart :data="item.serviceTypes" />
+          <div class="priority-summary">
+            <p>✅ 필수 개발 대상: <b>{{ priorityCount }}건</b></p>
+            <p>📊 총 공수 시간: <b>{{ priorityHours }}h</b></p>
+          </div>
+        </div>
+
+        <!-- ✅ 수정 & 삭제 버튼 -->
+        <div class="actions">
+          <button class="edit-btn" @click.stop="isModal1Open = true">⚙️</button>
+          <button class="delete-btn" @click.stop="nameList.splice(index, 1)">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 개발 목록 추가 모달 -->
+    <Modal v-if="isModal1Open" title="개발 목록 추가" @close="closeModal1" />
+    <Modal2 v-if="isModal2Open" title="신규 목록 추가" @close="closeModal2" />
+  </div>
+</template>
+
 <script setup>
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
@@ -54,52 +100,6 @@ const isModal2Open = ref(false);
 const closeModal1 = () => { isModal1Open.value = false; };
 const closeModal2 = () => { isModal2Open.value = false; };
 </script>
-
-<template>
-  <div class="development-container">
-    <div class="header">
-      <h2> S/R 요청 카드 리스트</h2>
-    </div>
-
-    <div class="btn_new">
-        <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
-    </div>
-
-    <!-- ✅ 리스트 출력 -->
-    <div class="list-container">
-      <div 
-        v-for="(item, index) in nameList" 
-        :key="index" 
-        class="list-item" 
-        @click="$router.push(`/development/${item.id}`)"
-      >
-        <div class="content">
-          <h3>{{ item.name }}</h3>
-          <p>{{ item.description }}</p>
-        </div>
-
-        <!-- ✅ 도넛 차트 & 필수 개발 대상 요약 -->
-        <div class="chart-summary">
-          <DonutChart :data="item.serviceTypes" />
-          <div class="priority-summary">
-            <p>✅ 필수 개발 대상: <b>{{ priorityCount }}건</b></p>
-            <p>📊 총 공수 시간: <b>{{ priorityHours }}h</b></p>
-          </div>
-        </div>
-
-        <!-- ✅ 수정 & 삭제 버튼 -->
-        <div class="actions">
-          <button class="edit-btn" @click.stop="isModal1Open = true">⚙️</button>
-          <button class="delete-btn" @click.stop="nameList.splice(index, 1)">🗑️</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ✅ 개발 목록 추가 모달 -->
-    <Modal v-if="isModal1Open" title="개발 목록 추가" @close="closeModal1" />
-    <Modal2 v-if="isModal2Open" title="신규 목록 추가" @close="closeModal2" />
-  </div>
-</template>
 
 <style scoped>
 .development-container {

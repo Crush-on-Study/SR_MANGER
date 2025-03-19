@@ -21,14 +21,14 @@
   import Header from './components/layout/Header.vue';
   import Sidebar from './components/layout/Sidebar.vue';
   
-  const route = useRoute();
-  
   const nameList = ref([
     { id: '2501', name: '25.01', description: '25년도 1월 개발 대상 목록 입니다.' },
     { id: '2503', name: '25.03(후보)', description: '25년도 3월 개발 대상 후보 목록 입니다.' },
     { id: '2504', name: '25.04(후보)', description: '25년도 4월 개발 대상 후보 목록 입니다.' }
   ]);
   
+  const route = useRoute();
+
   const addNewItem = (newItem) => {
     console.log('📌 [App.vue] addNewItem 호출됨', newItem);
     nameList.value.push(newItem);
