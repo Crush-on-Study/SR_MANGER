@@ -1,16 +1,98 @@
+<template>
+    <div class="detail-container">
+        <!-- ✅ 🔙 뒤로가기 버튼 -->
+        <div class="back-button" @click="goBackToDevelopment">
+        <span class="arrow">◀</span> 개발 목록 리스트
+        </div>
+
+        <h2>{{ selectedItem.name }} 개발 목록 리스트</h2>
+
+        <!-- ✅ 2-(3) Service Type 별 Estimated Hours 집계 -->
+        <div class="hours-summary">
+            <span>ICC: {{ totalHours.ICC }} hours</span> |
+            <span>E-KMTC: {{ totalHours.EKMTC }} hours</span> |
+            <span>RPA: {{ totalHours.RPA }} hours</span>
+        </div>
+
+        <!-- ✅ 2-(5) Download & Commit 버튼 -->
+        <div class="button-group">
+            <Button label="📥 Download" type="secondary" @click="downloadExcel" />
+            <Button label="✅ Commit" type="primary" @click="commitData" />
+        </div>
+        
+            <!-- ✅ 스크롤 적용된 테이블 컨테이너 -->
+        <div class="table-wrapper">
+            <table class="main-table">
+            <thead>
+                <tr>
+                    <th>Ref.no</th>
+                    <th>Title</th>
+                    <th>Domain</th>
+                    <th>Service Type</th>
+                    <th>Request Date</th>
+                    <th>Estimated Hours</th>
+                    <th>중요도</th>
+                    <th>제외</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- ✅ class 바인딩 적용 -->
+            <tr v-for="(item, index) in mainTableData" :key="item.id" :class="getRowClass(item)">
+                <td>{{ item.id }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.domain }}</td>
+                <td>{{ item.serviceType }}</td>
+                <td>{{ item.requestDate }}</td>
+                <td>{{ item.estimatedHours }}</td>
+                <td>{{ item.importance }}</td>
+                <td><button @click="excludeItem(index)">🚫</button></td>
+                <td><button @click="mainTableData.splice(index, 1)">🗑️</button></td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+        
+        <!-- ✅ Service Type별 테이블 -->
+        <div v-for="(items, type) in serviceTypeTables" :key="type" class="service-type-section">
+            <h3>{{ type }}</h3>
+            <table>
+            <thead>
+                <tr>
+                <th class="ref-no">Ref.no</th>
+                <th class="title">Title</th>
+                <th class="importance">중요도</th>
+                <th class="estimated-hours">Est. Hours</th>
+                <th class="action">추가</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in items" :key="item.id">
+                <td>{{ item.id }}</td>
+                <td>{{ item.title }}</td>
+                <td>{{ item.importance }}</td>
+                <td>{{ item.estimatedHours }}</td>
+                <td><button @click="restoreItem(type, index)">➕</button></td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+    </div>
+</template>
+
 <script setup>
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Button from '../../components/widgets/Button.vue';
-
-const route = useRoute();
-const router = useRouter();  // ✅ 뒤로가기 기능 추가
 
 const nameList = ref([
   { id: "2501", name: "25.01", description: "25년도 1월 개발 대상 목록 입니다." },
   { id: "2503", name: "25.03(후보)", description: "25년도 3월 개발 대상 후보 목록 입니다." },
   { id: "2504", name: "25.04(후보)", description: "25년도 4월 개발 대상 후보 목록 입니다." },
 ]);
+
+const route = useRoute();
+const router = useRouter();  // ✅ 뒤로가기 기능 추가
 
 // ✅ 뒤로가기 함수
 const goBackToDevelopment = () => {
@@ -125,89 +207,6 @@ const restoreItem = (serviceType, index) => {
 };
 
 </script>
-
-
-<template>
-    <div class="detail-container">
-        <!-- ✅ 🔙 뒤로가기 버튼 -->
-        <div class="back-button" @click="goBackToDevelopment">
-        <span class="arrow">◀</span> 개발 목록 리스트
-        </div>
-
-        <h2>{{ selectedItem.name }} 개발 목록 리스트</h2>
-
-        <!-- ✅ 2-(3) Service Type 별 Estimated Hours 집계 -->
-        <div class="hours-summary">
-            <span>ICC: {{ totalHours.ICC }} hours</span> |
-            <span>E-KMTC: {{ totalHours.EKMTC }} hours</span> |
-            <span>RPA: {{ totalHours.RPA }} hours</span>
-        </div>
-
-        <!-- ✅ 2-(5) Download & Commit 버튼 -->
-        <div class="button-group">
-            <Button label="📥 Download" type="secondary" @click="downloadExcel" />
-            <Button label="✅ Commit" type="primary" @click="commitData" />
-        </div>
-        
-            <!-- ✅ 스크롤 적용된 테이블 컨테이너 -->
-        <div class="table-wrapper">
-            <table class="main-table">
-            <thead>
-                <tr>
-                    <th>Ref.no</th>
-                    <th>Title</th>
-                    <th>Domain</th>
-                    <th>Service Type</th>
-                    <th>Request Date</th>
-                    <th>Estimated Hours</th>
-                    <th>중요도</th>
-                    <th>제외</th>
-                    <th>삭제</th>
-                </tr>
-            </thead>
-            <tbody>
-            <!-- ✅ class 바인딩 적용 -->
-            <tr v-for="(item, index) in mainTableData" :key="item.id" :class="getRowClass(item)">
-                <td>{{ item.id }}</td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.domain }}</td>
-                <td>{{ item.serviceType }}</td>
-                <td>{{ item.requestDate }}</td>
-                <td>{{ item.estimatedHours }}</td>
-                <td>{{ item.importance }}</td>
-                <td><button @click="excludeItem(index)">🚫</button></td>
-                <td><button @click="mainTableData.splice(index, 1)">🗑️</button></td>
-            </tr>
-            </tbody>
-        </table>
-        </div>
-        
-        <!-- ✅ Service Type별 테이블 -->
-        <div v-for="(items, type) in serviceTypeTables" :key="type" class="service-type-section">
-            <h3>{{ type }}</h3>
-            <table>
-            <thead>
-                <tr>
-                <th class="ref-no">Ref.no</th>
-                <th class="title">Title</th>
-                <th class="importance">중요도</th>
-                <th class="estimated-hours">Est. Hours</th>
-                <th class="action">추가</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="(item, index) in items" :key="item.id">
-                <td>{{ item.id }}</td>
-                <td>{{ item.title }}</td>
-                <td>{{ item.importance }}</td>
-                <td>{{ item.estimatedHours }}</td>
-                <td><button @click="restoreItem(type, index)">➕</button></td>
-                </tr>
-            </tbody>
-            </table>
-        </div>
-    </div>
-</template>
     
 
 <style scoped>

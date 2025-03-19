@@ -1,14 +1,3 @@
-<script setup>
-import { useRoute, useRouter } from 'vue-router';
-
-const router = useRouter();
-const route = useRoute();
-
-const navigate = (path) => {
-  router.push(path);
-};
-</script>
-
 <template>
   <nav class="sidebar">
     <!-- ✅ 프로필 영역 -->
@@ -37,6 +26,17 @@ const navigate = (path) => {
     </ul>
   </nav>
 </template>
+
+<script setup>
+import { useRoute, useRouter } from 'vue-router';
+
+const router = useRouter();
+const route = useRoute();
+
+const navigate = (path) => {
+  router.push(path);
+};
+</script>
 
 <style scoped>
 /* ✅ 프로필 섹션 */
