@@ -45,7 +45,7 @@
             <td><input type="checkbox" v-model="item.isChecked" /></td>
             <td>{{ item.id }}</td>
             <td>{{ item.domain }}</td>
-            <td>{{ item.title }}</td>
+            <td @click = "openDetailModal(item.id)" style="cursor:pointer;">{{ item.title }}</td>
             <td><StatusCard :status="item.status" /></td>
             <td>{{ item.serviceType }}</td>
             <td>{{ item.requestDate }}</td>
@@ -86,6 +86,12 @@
       @close="isModalOpen = false" 
       @addNewItem="addNewItem" 
     />
+
+    <DetailModal 
+      v-if="isDetailModalOpen" 
+      :detailInfo="detailInfo" 
+      @close="isDetailModalOpen = false"
+    />
   </div>
 </template>
 
@@ -96,6 +102,11 @@ import Button from '../../components/widgets/Button.vue';
 import Modal from '../../components/widgets/Modal.vue';
 import StatusCard from '../../components/widgets/StatusCard.vue';
 import MonthCard from '../../components/widgets/MonthCard.vue';
+import commonData from '../../data/common.js';
+import DetailModal from '../../components/Modals/DetailModal.vue';
+  
+const itemtemp = commonData.requests;
+
 
 // ✅ Props & Events
 const props = defineProps({
@@ -104,6 +115,14 @@ const props = defineProps({
 const emit = defineEmits(['addNewItem']);
 
 const isModalOpen = ref(false);
+const isDetailModalOpen = ref(false);
+const detailInfo = ref({});
+
+const openDetailModal = (id) => {
+  const selectedIdDetails = itemtemp[0].find((item) => item.ref_no === id);
+  detailInfo.value = selectedIdDetails;
+  isDetailModalOpen.value = true;
+}
 
 // ✅ 필터 상태 추가
 const filters = ref({
