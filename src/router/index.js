@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login from '../views/auth/Login.vue';
+// import Login from '../views/auth/Login.vue';
+import Login2 from '../views/auth/Login2.vue';
 import Priority from '../views/dashboard/Priority.vue';
 import General from '../views/dashboard/General.vue';
 import Development from '../views/dashboard/Development.vue';
@@ -7,7 +8,8 @@ import Detail from '../views/dashboard/Detail.vue';
 // import Stats from '../views/dashboard/Stats.vue';
 
 const routes = [
-  { path: '/', component: Login },          // 로그인 페이지
+//   { path: '/', component: Login },          // 로그인 페이지
+  { path: '/', component: Login2},
   { path: '/priority', component: Priority }, // 메인 페이지
   { path: '/general', component: General },
   { path: '/development', component: Development },

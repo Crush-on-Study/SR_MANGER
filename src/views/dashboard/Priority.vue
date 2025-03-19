@@ -35,10 +35,19 @@ const addNewItem = (selectedItems) => {
   isModalOpen.value = false;
 };
 
-// ✅ 기존 테이블 데이터
+// ✅ 기존 + 추가된 더미 데이터
 const items = ref([
   { id: 12345, domain: 'CC', title: 'VEP 제약 조건 추가의 건', status: 'Approved', serviceType: 'ICC', requestDate: '2025.03.11', estimatedHours: 17, isChecked: false, mandatory: 'N', priority: 1 },
   { id: 15346, domain: 'SO', title: 'e-billing 확대', status: 'Request', serviceType: 'RPA', requestDate: '2025.02.09', estimatedHours: 58, isChecked: false, mandatory: 'N', priority: 1 },
+
+  // ✅ 추가된 데이터 7개
+  { id: 17890, domain: 'VO', title: '클라우드 보안 정책 강화', status: 'In Progress', serviceType: 'E-KMTC', requestDate: '2025.04.15', estimatedHours: 40, isChecked: false, mandatory: 'Y', priority: 2 },
+  { id: 18901, domain: 'CS', title: '데이터 정합성 점검 시스템 구축', status: 'Approved', serviceType: 'ICC', requestDate: '2025.05.20', estimatedHours: 30, isChecked: false, mandatory: 'N', priority: 3 },
+  { id: 19876, domain: 'SC', title: '모바일 UI/UX 개선', status: 'Finished', serviceType: 'RPA', requestDate: '2025.06.01', estimatedHours: 50, isChecked: false, mandatory: 'N', priority: 2 },
+  { id: 20987, domain: 'SA', title: '실시간 모니터링 시스템 구축', status: 'Rejected', serviceType: 'E-KMTC', requestDate: '2025.07.13', estimatedHours: 22, isChecked: false, mandatory: 'Y', priority: 4 },
+  { id: 21543, domain: 'ST', title: '사내 커뮤니케이션 툴 개선', status: 'Request', serviceType: 'ICC', requestDate: '2025.08.25', estimatedHours: 35, isChecked: false, mandatory: 'N', priority: 1 },
+  { id: 22654, domain: 'CM', title: '자동화 테스트 프레임워크 구축', status: 'In Progress', serviceType: 'RPA', requestDate: '2025.09.10', estimatedHours: 28, isChecked: false, mandatory: 'Y', priority: 3 },
+  { id: 23456, domain: 'VO', title: 'API 성능 최적화 프로젝트', status: 'Finished', serviceType: 'E-KMTC', requestDate: '2025.10.05', estimatedHours: 45, isChecked: false, mandatory: 'N', priority: 2 }
 ]);
 
 const allChecked = computed({
@@ -105,7 +114,7 @@ const handleSearch = (searchFilters) => {
       <h2>우선순위 S/R 리스트</h2>
     </div>
 
-    <SearchBar 
+    <SearchBar class="searchbar"
       :domainOptions="['CC', 'CS', 'SO', 'SA', 'VO', 'ST']"
       :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
       :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
@@ -171,6 +180,13 @@ const handleSearch = (searchFilters) => {
       </span>
     </div>
 
+    <!-- 서비스 타입 -->
+    <div class="service-group">
+        <span v-for="(hours, type) in serviceHours" :key="type" class="total-item service-type">
+            {{ type }}: {{ hours }} hours
+        </span>
+    </div>
+
     <!-- ✅ 모달 추가 -->
     <Modal 
       v-if="isModalOpen" 
@@ -183,18 +199,22 @@ const handleSearch = (searchFilters) => {
 </template>
 
 <style scoped>
-.filter-header {
-  margin-bottom: 10px;
+.priority-container {
+    padding: 10px;
+}
+
+.filter-header, .searchbar {
+  margin: 10px;
 }
 
 .button-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin: 10px;
 }
 
 .table-container {
-  margin-top: 20px;
+  margin: 10px;
   background: white;
   border-radius: 8px;
   padding: 15px;
@@ -219,7 +239,7 @@ th {
 
 /* ✅ Total Hours 스타일 */
 .total-summary {
-  margin-top: 15px;
+  margin: 15px;
   padding: 10px;
   background: #eef;
   border-radius: 8px;
@@ -241,5 +261,10 @@ th {
 .total-highlight {
   color: red;
   font-weight: bold;
+}
+
+.service-type {
+  background: #ffede0; /* ✅ Service Type 스타일 추가 (연한 주황색) */
+  color: #b30000;
 }
 </style>

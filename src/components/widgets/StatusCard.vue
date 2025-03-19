@@ -44,15 +44,15 @@
   
   /* ✅ Status별 배경색 */
   .request {
-    background-color: #fbbc05; /* 노란색 */
+    background-color: #f1cd5e; /* 노란색 */
   }
   
   .approved {
-    background-color: #34a853; /* 초록색 */
+    background-color: #24c44f; /* 초록색 */
   }
   
   .in-progress {
-    background-color: #4285f4; /* 파란색 */
+    background-color: #679ffa; /* 파란색 */
   }
   
   .finished {

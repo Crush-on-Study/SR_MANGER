@@ -21,19 +21,7 @@ const logout = () => {
   </header>
 </template>
 
-<style scoped>
-.header {
-  display: flex;
-  width: calc(100% - 230px);;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
-  background: linear-gradient(135deg, #2980b9, #6dd5fa);
-  color: white;
-  height: 50px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease-in-out;
-}
+<style>
 
 .left {
   display: flex;

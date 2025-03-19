@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "chart.js": "^4.4.8",
+    "firebase": "^11.4.0",
     "pinia": "^3.0.1",
     "sr-manage": "file:",
     "vue": "^3.5.13",
+    "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

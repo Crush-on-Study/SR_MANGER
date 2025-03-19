@@ -1,11 +1,11 @@
 <template>
     <div class="app-layout">
-      <!-- ✅ 헤더 (전체 상단 차지) -->
-      <Header v-if="route.path !== '/'" />
+      <!-- ✅ 헤더 (전체 상단) -->
+      <Header v-if="route.path !== '/'" class="header" />
   
+      <!-- ✅ 사이드바 + 메인 컨텐츠 래핑 -->
       <div class="content-wrapper">
-        <!-- ✅ 사이드바 (왼쪽 고정) -->
-        <Sidebar v-if="route.path !== '/'" />
+        <Sidebar v-if="route.path !== '/'" class="sidebar" />
   
         <!-- ✅ 메인 컨텐츠 (남은 공간 차지) -->
         <div class="main-content">
@@ -36,51 +36,68 @@
   </script>
   
   <style scoped>
-  /* ✅ 전체 레이아웃 */
+  /* ✅ 전체 레이아웃 (column 구조) */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* 스크롤 없애기 */
+}
+
   .app-layout {
     display: flex;
     flex-direction: column;
     width: 100vw;
     height: 100vh;
   }
-  
-  /* ✅ 헤더 (전체 상단 차지) */
+
+  /* ✅ 헤더 (전체 너비 차지) */
   .header {
-    width: 100%;
-    height: 60px;
-    background: #3498db;
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 0 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2980b9, #6dd5fa);
+  color: white;
+  height: 50px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  padding: 10px;
+}
   
-  /* ✅ 헤더 아래 전체 컨텐츠 */
+  /* ✅ 사이드바 + 메인 컨텐츠 감싸는 래퍼 */
   .content-wrapper {
     display: flex;
-    flex: 1;
+    flex: 1; /* 부모 요소인 .app-layout에 맞춰 높이 자동 조정 */
     width: 100%;
-    height: calc(100vh - 60px); /* 헤더 높이만큼 제외 */
+    overflow: hidden;
+    gap: 10px;
   }
   
   /* ✅ 사이드바 (왼쪽 고정) */
   .sidebar {
-    width: 240px;
-    height: 100%;
-    background: white;
-    flex-shrink: 0;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  }
+  width: 280px;
+  height: 100vh;
+  background: linear-gradient(135deg, #ecf0f3, #ffffff);
+  color: #2c3e50;
+  padding: 20px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
   
-  /* ✅ 메인 컨텐츠 (남은 공간 자동 차지) */
+  /* ✅ 메인 컨텐츠 (남은 공간 차지) */
   .main-content {
-    flex: 1;
+    /* flex: 1; 남은 공간을 차지하도록 설정 */
+    width: 100%;
+    height: 100%;
     background-color: #f5f6fa;
-    padding: 20px;
     box-sizing: border-box;
-    overflow: auto;
+    overflow: hidden;
   }
   </style>
   

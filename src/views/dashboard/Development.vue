@@ -59,7 +59,10 @@ const closeModal2 = () => { isModal2Open.value = false; };
   <div class="development-container">
     <div class="header">
       <h2> S/R 요청 카드 리스트</h2>
-      <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
+    </div>
+
+    <div class="btn_new">
+        <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
     </div>
 
     <!-- ✅ 리스트 출력 -->
@@ -102,6 +105,13 @@ const closeModal2 = () => { isModal2Open.value = false; };
 .development-container {
   padding: 20px;
 }
+
+.btn_new {
+    display: flex;
+    justify-content: flex-end;
+    margin: 10px;
+}
+
 
 .list-container {
   display: flex;

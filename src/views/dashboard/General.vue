@@ -35,12 +35,20 @@ const addNewItem = (selectedItems) => {
   isModalOpen.value = false;
 };
 
-// ✅ 기존 테이블 데이터
+// ✅ 기존 + 추가된 더미 데이터
 const items = ref([
   { id: 12345, domain: 'CS', title: '2025 G.BSC Request', status: 'Approved', serviceType: 'ICC', requestDate: '2025-03-11', estimatedHours: 17, importance: '비긴급 - 중요도 상', isChecked: false },
   { id: 15346, domain: 'ST', title: '공동 운항 정산 협력표', status: 'Request', serviceType: 'RPA', requestDate: '2025-02-09', estimatedHours: 58, importance: '비긴급 - 중요도 하', isChecked: false },
-]);
 
+  // ✅ 추가된 데이터 7개
+  { id: 17890, domain: 'CC', title: '고객 데이터 관리 개선', status: 'In Progress', serviceType: 'E-KMTC', requestDate: '2025-04-15', estimatedHours: 40, importance: '긴급 - 중요도 하', isChecked: false },
+  { id: 18901, domain: 'SO', title: '시스템 통합 테스트', status: 'Approved', serviceType: 'ICC', requestDate: '2025-05-20', estimatedHours: 30, importance: '필수 개발 대상', isChecked: false },
+  { id: 19876, domain: 'VO', title: '보안 프로토콜 강화', status: 'Finished', serviceType: 'RPA', requestDate: '2025-06-01', estimatedHours: 50, importance: '비긴급 - 중요도 상', isChecked: false },
+  { id: 20987, domain: 'CM', title: '모바일 앱 성능 최적화', status: 'Rejected', serviceType: 'E-KMTC', requestDate: '2025-07-13', estimatedHours: 22, importance: '미지정', isChecked: false },
+  { id: 21543, domain: 'ST', title: '전자 결제 시스템 도입', status: 'Request', serviceType: 'ICC', requestDate: '2025-08-25', estimatedHours: 35, importance: '긴급 - 중요도 상', isChecked: false },
+  { id: 22654, domain: 'SC', title: '자동화 테스트 도구 개발', status: 'In Progress', serviceType: 'RPA', requestDate: '2025-09-10', estimatedHours: 28, importance: '비긴급 - 중요도 하', isChecked: false },
+  { id: 23456, domain: 'SA', title: '데이터 백업 정책 강화', status: 'Finished', serviceType: 'E-KMTC', requestDate: '2025-10-05', estimatedHours: 45, importance: '긴급 - 중요도 하', isChecked: false }
+]);
 const allChecked = computed({
   get: () => items.value.every((item) => item.isChecked),
   set: (value) => items.value.forEach((item) => (item.isChecked = value)),
@@ -105,7 +113,7 @@ const handleSearch = (searchFilters) => {
       <h2>일반 SR</h2>
     </div>
 
-    <SearchBar 
+    <SearchBar class="searchbar"
       :domainOptions="['CC', 'CS', 'SO', 'VO']"
       :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
       :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
@@ -147,18 +155,23 @@ const handleSearch = (searchFilters) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item) in filteredItems" :key="item.id">
-            <td><input type="checkbox" v-model="item.isChecked" /></td>
-            <td>{{ item.id }}</td>
-            <td>{{ item.domain }}</td>
-            <td>{{ item.title }}</td>
-            <td><StatusCard :status="item.status" /></td>
-            <td>{{ item.serviceType }}</td>
-            <td>{{ item.requestDate }}</td>
-            <td>{{ item.estimatedHours }}</td>
-            <td>{{ item.importance }}</td>
-          </tr>
+            <tr 
+                v-for="(item) in filteredItems" 
+                :key="item.id"
+                :class="{ 'highlight-mandatory': item.importance === '필수 개발 대상' }"
+            >
+                <td><input type="checkbox" v-model="item.isChecked" /></td>
+                <td>{{ item.id }}</td>
+                <td>{{ item.domain }}</td>
+                <td>{{ item.title }}</td>
+                <td><StatusCard :status="item.status" /></td>
+                <td>{{ item.serviceType }}</td>
+                <td>{{ item.requestDate }}</td>
+                <td>{{ item.estimatedHours }}</td>
+                <td>{{ item.importance }}</td>
+            </tr>
         </tbody>
+
       </table>
     </div>
 
@@ -182,18 +195,23 @@ const handleSearch = (searchFilters) => {
 </template>
 
 <style scoped>
-.filter-header {
-  margin-bottom: 10px;
+.general-container {
+    padding: 10px;
 }
+
+.filter-header, .searchbar {
+  margin: 10px;
+}
+
 
 .button-container {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
+  margin: 10px;
 }
 
 .table-container {
-  margin-top: 20px;
+  margin: 10px;
   background: white;
   border-radius: 8px;
   padding: 15px;
@@ -204,6 +222,14 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+
+/* ✅ 필수 개발 대상 강조 스타일 */
+.highlight-mandatory {
+  background-color: #fff5cc !important; /* 연한 노란색 배경 */
+  color: red !important; /* 강조된 글씨 색상 */
+  font-weight: bold;
+}
+
 
 th, td {
   border-bottom: 1px solid #ddd;

@@ -39,17 +39,6 @@ const navigate = (path) => {
 </template>
 
 <style scoped>
-.sidebar {
-  width: 230px;
-  height: 100vh;
-  background: linear-gradient(135deg, #ecf0f3, #ffffff);
-  color: #2c3e50;
-  padding: 20px;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-}
-
 /* ✅ 프로필 섹션 */
 .profile-section {
   display: flex;
@@ -91,14 +80,13 @@ const navigate = (path) => {
 
 .menu-list li {
   display: flex;
+  align-items: center; /* 아이콘과 텍스트 정렬 */
   gap: 10px;
   padding: 12px 20px;
   cursor: pointer;
-  border-radius: 25px;
-  font-size: 16px;
+  border-radius: 15px;
+  font-size: 14px;
   transition: all 0.3s ease-in-out;
-  width: 60%;
-  margin: 8px auto;
   color: #2c3e50;
 }
 
@@ -106,20 +94,22 @@ const navigate = (path) => {
   background: rgba(52, 152, 219, 0.2);
 }
 
-.menu-list .icon {
+/* ✅ 아이콘 & 텍스트 스타일 */
+.icon {
   font-size: 18px;
+  display: flex;
+  align-items: center;
 }
 
-.menu-list .menu-text {
-  flex-grow: 1;
+.menu-text {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
 }
 
-/* ✅ 활성화된 메뉴 */
+/* ✅ 활성화된 메뉴 (bold만 적용, 배경 없음) */
 .active {
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: white;
   font-weight: bold;
-  box-shadow: 0px 4px 10px rgba(52, 152, 219, 0.3);
-  transform: scale(1.05);
+  color: #2980b9;
 }
 </style>

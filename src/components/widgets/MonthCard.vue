@@ -44,15 +44,15 @@
   }
   
   /* ✅ 개발 Month 색상 */
-  .january { background-color: #FF5733; }
-  .february { background-color: #FFBD33; }
-  .march { background-color: #33FF57; }
-  .april { background-color: #33FFF3; }
-  .may { background-color: #338AFF; }
-  .june { background-color: #8D33FF; }
-  .july { background-color: #FF33A8; }
-  .august { background-color: #FF3357; }
-  .september { background-color: #A833FF; }
+  .january { background-color: #da9c8e; }
+  .february { background-color: #f1cb77; }
+  .march { background-color: #7afc91; }
+  .april { background-color: #7cf7ee; }
+  .may { background-color: #83b8fd; }
+  .june { background-color: #b688f3; }
+  .july { background-color: #ec64b1; }
+  .august { background-color: #e06279; }
+  .september { background-color: #ffa033; }
   .october { background-color: #33FFA8; }
   .november { background-color: #FFD733; }
   .december { background-color: #B5B5B5; }
