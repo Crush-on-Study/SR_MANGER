@@ -14,13 +14,13 @@
 
     <!-- ✅ 개발 대상 추가 버튼 -->
     <div class="button-container">
-      <Button 
+    <Button 
         label="+ 개발 대상 추가" 
         type="primary" 
-        :disabled="!isAnyChecked"
-        @click="openModal" 
-      />
+        @click="handleAddTarget"
+    />
     </div>
+
 
     <!-- ✅ 테이블 -->
     <div class="table-container">
@@ -127,6 +127,16 @@ const openDetailModal = (id) => {
   isDetailModalOpen.value = true;
 };
 
+// ✅ 개발 대상 추가 버튼 클릭 시 동작
+const handleAddTarget = () => {
+  if (!isAnyChecked.value) {
+    alert("최소 1개 이상의 S/R을 선택하세요");
+    return;
+  }
+  openModal();
+};
+
+
 
 // ✅ 필터 상태 추가
 const filters = ref({
@@ -170,7 +180,6 @@ const allChecked = computed({
 });
 
 const selectedItems = computed(() => items.value.filter(item => item.isChecked));
-
 const isAnyChecked = computed(() => selectedItems.value.length > 0);
 
 // ✅ **도메인별 Estimated Hours 집계 (체크 여부 반영)**

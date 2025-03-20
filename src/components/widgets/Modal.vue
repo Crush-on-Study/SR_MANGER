@@ -1,46 +1,51 @@
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="modal-content">
-      <h3>개발 목록에 추가</h3>
-
-      <!-- ✅ 체크리스트 (세로 정렬) -->
-      <div class="checkbox-list">
-        <label v-for="(item, index) in nameList" :key="index" class="checkbox-item">
-          <input type="checkbox" v-model="checkedItems" :value="item.name" />
-          {{ item.name }}
-        </label>
-      </div>
-
-      <div class="modal-footer">
-        <Button label="+ 새로운 목록" type="secondary" @click="isNewListModalOpen = true" />
-      </div>
-
-      <button class="close-btn" @click="$emit('close')">X</button>
-    </div>
-
-    <!-- ✅ 새로운 목록 추가 모달 -->
-    <div class="modal-overlay new-list-modal" v-if="isNewListModalOpen" @click.self="isNewListModalOpen = false">
+    <div class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-content">
-        <h3>새로운 목록 추가</h3>
-        
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" v-model="newListName" placeholder="Enter item name" required />
+        <h3>개발 목록에 추가</h3>
+  
+        <!-- ✅ 체크리스트 (세로 정렬) -->
+        <div class="checkbox-list">
+          <label v-for="(item, index) in nameList" :key="index" class="checkbox-item">
+            <input type="checkbox" v-model="checkedItems" :value="item.name" />
+            {{ item.name }}
+          </label>
         </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea v-model="newListDescription" placeholder="Enter item description"></textarea>
-        </div>
-
+  
         <div class="modal-footer">
-          <Button label="Cancel" type="secondary" @click="isNewListModalOpen = false" />
-          <Button label="Create" type="primary" @click="createNewList" />
+          <!-- ✅ 기존 '새로운 목록 추가' 버튼 -->
+          <Button label="+ 새로운 목록" type="secondary" @click="isNewListModalOpen = true" />
+          
+          <!-- ✅ 새롭게 추가된 '카드에 추가' 버튼 -->
+          <Button label="카드에 추가" type="primary" @click="handleAddToCard" />
+        </div>
+  
+        <button class="close-btn" @click="$emit('close')">X</button>
+      </div>
+  
+      <!-- ✅ 새로운 목록 추가 모달 -->
+      <div class="modal-overlay new-list-modal" v-if="isNewListModalOpen" @click.self="isNewListModalOpen = false">
+        <div class="modal-content">
+          <h3>새로운 목록 추가</h3>
+          
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" v-model="newListName" placeholder="Enter item name" required />
+          </div>
+  
+          <div class="form-group">
+            <label>Description</label>
+            <textarea v-model="newListDescription" placeholder="Enter item description"></textarea>
+          </div>
+  
+          <div class="modal-footer">
+            <Button label="Cancel" type="secondary" @click="isNewListModalOpen = false" />
+            <Button label="Create" type="primary" @click="createNewList" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</template>
+  </template>
+  
 
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue';
@@ -55,7 +60,7 @@ const newListName = ref('');
 const newListDescription = ref('');
 const checkedItems = ref([]); // ✅ 체크된 항목 저장
 
-const emit = defineEmits(['addNewItem']);
+const emit = defineEmits(['addNewItem', 'addToCard']);
 
 const createNewList = () => {
   if (!newListName.value.trim()) {
@@ -76,6 +81,23 @@ const createNewList = () => {
   newListName.value = '';
   newListDescription.value = '';
   isNewListModalOpen.value = false;
+};
+
+// ✅ 카드에 추가 버튼 클릭 시 동작
+const handleAddToCard = () => {
+  if (checkedItems.value.length === 0) {
+    alert("최소 하나 이상의 목록을 선택하세요!");
+    return;
+  }
+
+  console.log("📌 [Modal.vue] 선택된 항목:", checkedItems.value);
+  
+  // ✅ 선택된 목록을 부모 컴포넌트에 전달
+  emit('addToCard', checkedItems.value);
+
+  // ✅ 체크된 목록 초기화 및 모달 닫기
+  checkedItems.value = [];
+  emit('close');
 };
 </script>
 
@@ -98,6 +120,13 @@ const createNewList = () => {
   border-radius: 10px;
   width: 300px;
   position: relative;
+}
+
+/* 새로운 목록 추가 , 카드에 추가 */
+.modal-footer {
+  margin-top: 15px;
+  display: flex;
+  gap: 15px;
 }
 
 /* ✅ 체크리스트 세로 정렬 */
