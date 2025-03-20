@@ -6,7 +6,7 @@
     </div>
 
     <SearchBar class="searchbar"
-      :domainOptions="['CC', 'CS', 'SO', 'SA', 'VO', 'ST']"
+      :domainOptions="['CC', 'SO']"
       :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
       :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
       @search="handleSearch"
@@ -14,13 +14,8 @@
 
     <!-- ✅ 개발 대상 추가 버튼 -->
     <div class="button-container">
-    <Button 
-        label="+ 개발 대상 추가" 
-        type="primary" 
-        @click="handleAddTarget"
-    />
+      <Button label="+ 개발 대상 추가" type="primary" @click="handleAddTarget" />
     </div>
-
 
     <!-- ✅ 테이블 -->
     <div class="table-container">
@@ -41,11 +36,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(item) in filteredItems" :key="item.id">
+          <tr v-for="(item) in filteredItems" :key="item.ref_no">
             <td><input type="checkbox" v-model="item.isChecked" /></td>
-            <td>{{ item.id }}</td>
+            <td>{{ item.ref_no }}</td>
             <td>{{ item.domain }}</td>
-            <td @click = "openDetailModal(item.id)" style="cursor:pointer;">{{ item.title }}</td>
+            <td @click="openDetailModal(item.ref_no)" style="cursor:pointer;">{{ item.title }}</td>
             <td><StatusCard :status="item.status" /></td>
             <td>{{ item.serviceType }}</td>
             <td>{{ item.requestDate }}</td>
@@ -71,174 +66,108 @@
       </span>
     </div>
 
-    <!-- 서비스 타입 -->
-    <div class="service-group">
-        <span v-for="(hours, type) in serviceHours" :key="type" class="total-item service-type">
-            {{ type }}: {{ hours }} hours
-        </span>
-    </div>
-
-
     <!-- ✅ 모달 추가 -->
-    <Modal 
-      v-if="isModalOpen" 
-      title="개발 목록에 추가" 
-      :nameList="nameList" 
-      @close="isModalOpen = false" 
-      @addNewItem="addNewItem" 
-    />
-
-    <DetailModal 
-      v-if="isDetailModalOpen" 
-      :detailInfo="detailInfo" 
-      @close="isDetailModalOpen = false"
-    />
+    <Modal v-if="isModalOpen" title="개발 목록에 추가" :nameList="nameList" @close="isModalOpen = false" @addNewItem="addNewItem" />
+    <DetailModal v-if="isDetailModalOpen" :detailInfo="detailInfo" @close="isDetailModalOpen = false" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, defineProps, defineEmits } from 'vue';
-import SearchBar from '../../components/widgets/SearchBar.vue';
-import Button from '../../components/widgets/Button.vue';
-import Modal from '../../components/widgets/Modal.vue';
-import StatusCard from '../../components/widgets/StatusCard.vue';
-import MonthCard from '../../components/widgets/MonthCard.vue';
-import commonData from '../../data/common.js';
-import DetailModal from '../../components/Modals/DetailModal.vue';
-  
-const itemtemp = commonData.requests;
+import { ref, computed, onMounted } from "vue";
+import { getPrioritySRRequests } from "../../backend/firestoreService.js";
+import SearchBar from "../../components/widgets/SearchBar.vue";
+import Button from "../../components/widgets/Button.vue";
+import Modal from "../../components/widgets/Modal.vue";
+import StatusCard from "../../components/widgets/StatusCard.vue";
+import MonthCard from "../../components/widgets/MonthCard.vue";
+import DetailModal from "../../components/Modals/DetailModal.vue";
 
+// ✅ Firestore에서 가져온 데이터를 저장할 상태 변수
+const items = ref([]);
 
-// ✅ Props & Events
-const props = defineProps({
-  nameList: Array,
-});
-const emit = defineEmits(['addNewItem']);
-
-const isModalOpen = ref(false);
-const isDetailModalOpen = ref(false);
-const detailInfo = ref({});
-
-const openDetailModal = (id) => {
-  const selectedIdDetails = itemtemp.find((item) => item.ref_no === id);
-  if (!selectedIdDetails) return;
-
-  detailInfo.value = selectedIdDetails;
-  isDetailModalOpen.value = true;
+// ✅ Firestore에서 데이터를 가져와 `items`에 저장
+const fetchPrioritySRRequests = async () => {
+  items.value = await getPrioritySRRequests();
+  console.log("📌 Firestore에서 가져온 Priority 데이터:", items.value);
 };
 
-// ✅ 개발 대상 추가 버튼 클릭 시 동작
-const handleAddTarget = () => {
-  if (!isAnyChecked.value) {
-    alert("최소 1개 이상의 S/R을 선택하세요");
-    return;
-  }
-  openModal();
-};
-
-
+// ✅ 컴포넌트가 마운트될 때 Firestore 데이터 로드
+onMounted(fetchPrioritySRRequests);
 
 // ✅ 필터 상태 추가
 const filters = ref({
   searchText: '',
-  fromDate: '',
-  toDate: '',
   domain: '',
   status: '',
-  serviceType: '',
+  serviceType: ''
 });
 
-// ✅ 모달 열기 함수
-const openModal = () => {
-  isModalOpen.value = true;
+const filtersApplied = ref(false);
+
+const handleSearch = (searchFilters) => {
+  Object.assign(filters.value, searchFilters);
+  filtersApplied.value = true;
 };
 
-// ✅ 개발 목록에 추가 (선택한 데이터 전달)
-const addNewItem = (selectedItems) => {
-  emit('addNewItem', selectedItems);
-  isModalOpen.value = false;
-};
+// ✅ 필터링된 리스트 계산
+const filteredItems = computed(() => {
+  if (!filtersApplied.value) return items.value;
 
-// ✅ 기존 + 추가된 더미 데이터
-const items = ref([
-  { id: 12345, domain: 'CC', title: 'VEP 제약 조건 추가의 건', status: 'Approved', serviceType: 'ICC', requestDate: '2025.03.11', estimatedHours: 17, isChecked: false, mandatory: 'N', priority: 1 },
-  { id: 15346, domain: 'SO', title: 'e-billing 확대', status: 'Request', serviceType: 'RPA', requestDate: '2025.02.09', estimatedHours: 58, isChecked: false, mandatory: 'N', priority: 1 },
+  return items.value.filter(item => (
+    (!filters.value.searchText || item.title.toLowerCase().includes(filters.value.searchText.trim().toLowerCase())) &&
+    (!filters.value.domain || item.domain === filters.value.domain) &&
+    (!filters.value.status || item.status === filters.value.status) &&
+    (!filters.value.serviceType || item.serviceType === filters.value.serviceType)
+  ));
+});
 
-  // ✅ 추가된 데이터 7개
-  { id: 17890, domain: 'VO', title: '클라우드 보안 정책 강화', status: 'In Progress', serviceType: 'E-KMTC', requestDate: '2025.04.15', estimatedHours: 40, isChecked: false, mandatory: 'Y', priority: 2 },
-  { id: 18901, domain: 'CS', title: '데이터 정합성 점검 시스템 구축', status: 'Approved', serviceType: 'ICC', requestDate: '2025.05.20', estimatedHours: 30, isChecked: false, mandatory: 'N', priority: 3 },
-  { id: 19876, domain: 'SC', title: '모바일 UI/UX 개선', status: 'Finished', serviceType: 'RPA', requestDate: '2025.06.01', estimatedHours: 50, isChecked: false, mandatory: 'N', priority: 2 },
-  { id: 20987, domain: 'SA', title: '실시간 모니터링 시스템 구축', status: 'Rejected', serviceType: 'E-KMTC', requestDate: '2025.07.13', estimatedHours: 22, isChecked: false, mandatory: 'Y', priority: 4 },
-  { id: 21543, domain: 'ST', title: '사내 커뮤니케이션 툴 개선', status: 'Request', serviceType: 'ICC', requestDate: '2025.08.25', estimatedHours: 35, isChecked: false, mandatory: 'N', priority: 1 },
-  { id: 22654, domain: 'CM', title: '자동화 테스트 프레임워크 구축', status: 'In Progress', serviceType: 'RPA', requestDate: '2025.09.10', estimatedHours: 28, isChecked: false, mandatory: 'Y', priority: 3 },
-  { id: 23456, domain: 'VO', title: 'API 성능 최적화 프로젝트', status: 'Finished', serviceType: 'E-KMTC', requestDate: '2025.10.05', estimatedHours: 45, isChecked: false, mandatory: 'N', priority: 2 }
-]);
-
+// ✅ 체크박스 관련 로직
 const allChecked = computed({
   get: () => items.value.every((item) => item.isChecked),
   set: (value) => items.value.forEach((item) => (item.isChecked = value)),
 });
 
+// ✅ 선택된 아이템 목록
 const selectedItems = computed(() => items.value.filter(item => item.isChecked));
 const isAnyChecked = computed(() => selectedItems.value.length > 0);
 
-// ✅ **도메인별 Estimated Hours 집계 (체크 여부 반영)**
+// ✅ 도메인별 Estimated Hours 집계
 const totalHoursByDomain = computed(() => {
-  let hours = {
-    CC: 0,
-    SO: 0
-  };
-
+  let hours = {};
   selectedItems.value.forEach((item) => {
-    if (hours[item.domain] !== undefined) {
-      hours[item.domain] += item.estimatedHours;
+    if (!hours[item.domain]) {
+      hours[item.domain] = 0;
     }
+    hours[item.domain] += item.estimatedHours;
   });
-
   return hours;
 });
 
-// ✅ 전체 Total 계산 (도메인별 합계)
+// ✅ 전체 Total 계산
 const totalHours = computed(() => {
   return Object.values(totalHoursByDomain.value).reduce((sum, value) => sum + value, 0);
 });
 
-const filtersApplied = ref(false); // 🔥 Search 버튼을 눌렀는지 체크
-
-const handleSearch = (searchFilters) => {
-  Object.assign(filters.value, searchFilters);
-  filtersApplied.value = true; // ✅ Search 버튼이 눌린 후 필터 적용
+// ✅ 모달 열기
+const isModalOpen = ref(false);
+const openModal = () => {
+  isModalOpen.value = true;
 };
 
-// ✅ "Return" 버튼 클릭 시 모든 필터 초기화 + 전체 데이터 표시
-const resetFilters = () => {
-  filters.value = {  // 필터 값 초기화
-    searchText: '',
-    fromDate: '',
-    toDate: '',
-    domain: '',
-    status: '',
-    serviceType: ''
-  };
-  filtersApplied.value = false; // ✅ 전체 데이터 다시 보이게 설정
+// ✅ 개발 목록에 추가
+const addNewItem = (selectedItems) => {
+  isModalOpen.value = false;
 };
 
-const filteredItems = computed(() => {
-  // ✅ Search 버튼을 안 눌렀다면 전체 데이터 반환
-  if (!filtersApplied.value) return items.value;
-
-  return items.value.filter((item) => {
-    return (
-      (!filters.value.searchText || item.title.toLowerCase().includes(filters.value.searchText.trim().toLowerCase())) &&
-      (!filters.value.fromDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) >= new Date(filters.value.fromDate))) &&
-      (!filters.value.toDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) <= new Date(filters.value.toDate))) &&
-      (filters.value.domain === "ALL" || item.domain === filters.value.domain) &&
-      (filters.value.status === "ALL" || item.status === filters.value.status) &&
-      (filters.value.serviceType === "ALL" || item.serviceType === filters.value.serviceType)
-    );
-  });
-});
-
+// ✅ 상세 모달 열기
+const isDetailModalOpen = ref(false);
+const detailInfo = ref({});
+const openDetailModal = (id) => {
+  const selectedIdDetails = items.value.find((item) => item.ref_no === id);
+  if (!selectedIdDetails) return;
+  detailInfo.value = selectedIdDetails;
+  isDetailModalOpen.value = true;
+};
 </script>
 
 

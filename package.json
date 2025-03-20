@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "chart.js": "^4.4.8",
+    "dotenv": "^16.4.7",
     "firebase": "^11.4.0",
     "pinia": "^3.0.1",
     "sr-manage": "file:",
