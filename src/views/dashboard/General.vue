@@ -60,7 +60,18 @@
                 <td>{{ item.serviceType }}</td>
                 <td>{{ item.requestDate }}</td>
                 <td>{{ item.estimatedHours }}</td>
-                <td>{{ item.importance }}</td>
+                <td>
+                    <!-- 중요도 드롭다운 추가 -->
+                    <select v-model="item.importance">
+                        <option disabled value="">중요도 선택</option>
+                        <option value="비긴급 - 중요도 하">비긴급 - 중요도 하</option>
+                        <option value="비긴급 - 중요도 상">비긴급 - 중요도 상</option>
+                        <option value="긴급 - 중요도 하">긴급 - 중요도 하</option>
+                        <option value="긴급 - 중요도 상">긴급 - 중요도 상</option>
+                        <option value="필수 개발 대상">필수 개발 대상</option>
+                        <option value="미지정">미지정</option>
+                    </select>
+                </td>
             </tr>
         </tbody>
 
@@ -100,16 +111,18 @@ const props = defineProps({
 const emit = defineEmits(['addNewItem']);
 
 const isModalOpen = ref(false);
+const filtersApplied = ref(false); // 🔥 필터가 적용되었는지 체크하는 상태
+
 
 // ✅ 필터 상태 추가
 const filters = ref({
   searchText: '',
   fromDate: '',
   toDate: '',
-  domain: '',
-  status: '',
-  serviceType: '',
-  importance: '',
+  domain: 'ALL',
+  status: 'ALL',
+  serviceType: 'ALL',
+  importance: 'ALL',
 });
 
 // ✅ 모달 열기 함수
@@ -173,25 +186,30 @@ const totalHours = computed(() => {
   return Object.values(totalHoursByDomain.value).reduce((sum, value) => sum + value, 0);
 });
 
-// ✅ 필터링 함수
 const filteredItems = computed(() => {
+  // ✅ Search 버튼을 누르지 않았다면 모든 데이터 반환
+  if (!filtersApplied.value) return items.value;
+
   return items.value.filter((item) => {
     return (
-      (!filters.value.searchText || item.title.includes(filters.value.searchText)) &&
-      (!filters.value.fromDate || new Date(item.requestDate) >= new Date(filters.value.fromDate)) &&
-      (!filters.value.toDate || new Date(item.requestDate) <= new Date(filters.value.toDate)) &&
-      (!filters.value.domain || item.domain === filters.value.domain) &&
-      (!filters.value.status || item.status === filters.value.status) &&
-      (!filters.value.serviceType || item.serviceType === filters.value.serviceType) &&
-      (!filters.value.importance || item.importance === filters.value.importance)
+      (!filters.value.searchText || item.title.toLowerCase().includes(filters.value.searchText.trim().toLowerCase())) &&
+      (!filters.value.fromDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) >= new Date(filters.value.fromDate))) &&
+      (!filters.value.toDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) <= new Date(filters.value.toDate))) &&
+      (filters.value.domain === "ALL" || item.domain === filters.value.domain) &&
+      (filters.value.status === "ALL" || item.status === filters.value.status) &&
+      (filters.value.serviceType === "ALL" || item.serviceType === filters.value.serviceType) &&
+      (filters.value.importance === "ALL" || !filters.value.importance || item.importance === filters.value.importance)
     );
   });
 });
 
+
+
 // ✅ 검색 필터 적용
 const handleSearch = (searchFilters) => {
-  filters.value = searchFilters;
+  filters.value = { ...searchFilters, importance: searchFilters.importance || "ALL" };
 };
+
 </script>
 
 <style scoped>
@@ -221,6 +239,15 @@ const handleSearch = (searchFilters) => {
 table {
   width: 100%;
   border-collapse: collapse;
+}
+
+select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 70%;
+  text-align: left;
 }
 
 /* ✅ 필수 개발 대상 강조 스타일 */

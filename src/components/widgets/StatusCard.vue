@@ -42,25 +42,31 @@
     color: white;
   }
   
-  /* ✅ Status별 배경색 */
-  .request {
-    background-color: #f1cd5e; /* 노란색 */
-  }
-  
-  .approved {
-    background-color: #24c44f; /* 초록색 */
-  }
-  
-  .in-progress {
-    background-color: #679ffa; /* 파란색 */
-  }
-  
-  .finished {
-    background-color: #9e9e9e; /* 회색 */
-  }
-  
-  .rejected {
-    background-color: #ea4335; /* 빨간색 */
-  }
+/* ✅ Status별 배경색 (부드러운 컬러로 변경) */
+.request {
+  background-color: #f8e3a1; /* 옅은 노랑 */
+  color: #755e06;
+}
+
+.approved {
+  background-color: #a7e3a5; /* 옅은 초록 */
+  color: #246b2e;
+}
+
+.in-progress {
+  background-color: #c4dcfc; /* 옅은 파랑 */
+  color: #2a5fba;
+}
+
+.finished {
+  background-color: #d6d6d6; /* 부드러운 회색 */
+  color: #555;
+}
+
+.rejected {
+  background-color: #f5b5b0; /* 연한 빨강 */
+  color: #a82b1e;
+}
+
   </style>
   

@@ -42,19 +42,5 @@
     text-align: center;
     color: black;
   }
-  
-  /* ✅ 개발 Month 색상 */
-  .january { background-color: #da9c8e; }
-  .february { background-color: #f1cb77; }
-  .march { background-color: #7afc91; }
-  .april { background-color: #7cf7ee; }
-  .may { background-color: #83b8fd; }
-  .june { background-color: #b688f3; }
-  .july { background-color: #ec64b1; }
-  .august { background-color: #e06279; }
-  .september { background-color: #ffa033; }
-  .october { background-color: #33FFA8; }
-  .november { background-color: #FFD733; }
-  .december { background-color: #B5B5B5; }
   </style>
   

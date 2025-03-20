@@ -51,7 +51,7 @@
             <td>{{ item.requestDate }}</td>
             <td>{{ item.estimatedHours }}</td>
             <td>
-              <select v-model="item.mandatory">
+              <select v-model="item.mandatory" class="mandatory-input">
                 <option>Y</option>
                 <option>N</option>
               </select>
@@ -77,6 +77,7 @@
             {{ type }}: {{ hours }} hours
         </span>
     </div>
+
 
     <!-- ✅ 모달 추가 -->
     <Modal 
@@ -119,10 +120,13 @@ const isDetailModalOpen = ref(false);
 const detailInfo = ref({});
 
 const openDetailModal = (id) => {
-  const selectedIdDetails = itemtemp[0].find((item) => item.ref_no === id);
+  const selectedIdDetails = itemtemp.find((item) => item.ref_no === id);
+  if (!selectedIdDetails) return;
+
   detailInfo.value = selectedIdDetails;
   isDetailModalOpen.value = true;
-}
+};
+
 
 // ✅ 필터 상태 추가
 const filters = ref({
@@ -173,14 +177,7 @@ const isAnyChecked = computed(() => selectedItems.value.length > 0);
 const totalHoursByDomain = computed(() => {
   let hours = {
     CC: 0,
-    CS: 0,
-    SO: 0,
-    SA: 0,
-    VO: 0,
-    CC: 0,
-    CM: 0,
-    ST: 0,
-    SC: 0,
+    SO: 0
   };
 
   selectedItems.value.forEach((item) => {
@@ -197,24 +194,42 @@ const totalHours = computed(() => {
   return Object.values(totalHoursByDomain.value).reduce((sum, value) => sum + value, 0);
 });
 
-// ✅ 필터링 함수
+const filtersApplied = ref(false); // 🔥 Search 버튼을 눌렀는지 체크
+
+const handleSearch = (searchFilters) => {
+  Object.assign(filters.value, searchFilters);
+  filtersApplied.value = true; // ✅ Search 버튼이 눌린 후 필터 적용
+};
+
+// ✅ "Return" 버튼 클릭 시 모든 필터 초기화 + 전체 데이터 표시
+const resetFilters = () => {
+  filters.value = {  // 필터 값 초기화
+    searchText: '',
+    fromDate: '',
+    toDate: '',
+    domain: '',
+    status: '',
+    serviceType: ''
+  };
+  filtersApplied.value = false; // ✅ 전체 데이터 다시 보이게 설정
+};
+
 const filteredItems = computed(() => {
+  // ✅ Search 버튼을 안 눌렀다면 전체 데이터 반환
+  if (!filtersApplied.value) return items.value;
+
   return items.value.filter((item) => {
     return (
-      (!filters.value.searchText || item.title.includes(filters.value.searchText)) &&
-      (!filters.value.fromDate || new Date(item.requestDate) >= new Date(filters.value.fromDate)) &&
-      (!filters.value.toDate || new Date(item.requestDate) <= new Date(filters.value.toDate)) &&
-      (!filters.value.domain || item.domain === filters.value.domain) &&
-      (!filters.value.status || item.status === filters.value.status) &&
-      (!filters.value.serviceType || item.serviceType === filters.value.serviceType)
+      (!filters.value.searchText || item.title.toLowerCase().includes(filters.value.searchText.trim().toLowerCase())) &&
+      (!filters.value.fromDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) >= new Date(filters.value.fromDate))) &&
+      (!filters.value.toDate || (new Date(item.requestDate).toString() !== 'Invalid Date' && new Date(item.requestDate) <= new Date(filters.value.toDate))) &&
+      (filters.value.domain === "ALL" || item.domain === filters.value.domain) &&
+      (filters.value.status === "ALL" || item.status === filters.value.status) &&
+      (filters.value.serviceType === "ALL" || item.serviceType === filters.value.serviceType)
     );
   });
 });
 
-// ✅ 검색 필터 적용
-const handleSearch = (searchFilters) => {
-  filters.value = searchFilters;
-};
 </script>
 
 
@@ -231,6 +246,42 @@ const handleSearch = (searchFilters) => {
   display: flex;
   justify-content: flex-end;
   margin: 10px;
+}
+
+/* ✅ 우선 순위 입력 필드 */
+.priority-input {
+  width: 50px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 14px;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease-in-out;
+}
+
+.priority-input:focus {
+  outline: none;
+  border-color: #3498db;
+  background-color: white;
+}
+
+/* ✅ 중요도 선택 드롭다운 */
+.mandatory-select {
+  width: 70px;
+  padding: 6px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.mandatory-select:focus {
+  outline: none;
+  border-color: #3498db;
+  background-color: #f1f1f1;
 }
 
 .table-container {

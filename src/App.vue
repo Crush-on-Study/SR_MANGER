@@ -1,11 +1,17 @@
+<!-- 2025/03/20 리팩토링 설명 드립니다.-->
+ <!-- 작업자 : HB Kang -->
+<!-- 1. SM님이 애용하시는 computed 속성 활용해서 route에 직접 접근하는 것을 showLayout 변수에다 computed를 써서 path에 조건을 걸어봤습니다. -->
+ <!-- 사유 : 규모는 작은애라 사실 성능상 문제는 없을거 같은데, 코드 통일성을 위해 넣었습니다.  -->
+
+
 <template>
     <div class="app-layout">
       <!-- ✅ 헤더 (전체 상단) -->
-      <Header v-if="route.path !== '/'" class="header" />
+      <Header v-if="showLayout" class="header" />
   
       <!-- ✅ 사이드바 + 메인 컨텐츠 래핑 -->
       <div class="content-wrapper">
-        <Sidebar v-if="route.path !== '/'" class="sidebar" />
+        <Sidebar v-if="showLayout" class="sidebar" />
   
         <!-- ✅ 메인 컨텐츠 (남은 공간 차지) -->
         <div class="main-content">
@@ -16,20 +22,26 @@
   </template>
   
   <script setup>
-  import { ref } from 'vue';
+  import { ref, computed } from 'vue';
   import { RouterView, useRoute } from 'vue-router';
   import Header from './components/layout/Header.vue';
   import Sidebar from './components/layout/Sidebar.vue';
   
   const nameList = ref([
-    { id: '2501', name: '25.01', description: '25년도 1월 개발 대상 목록 입니다.' },
-    { id: '2503', name: '25.03(후보)', description: '25년도 3월 개발 대상 후보 목록 입니다.' },
-    { id: '2504', name: '25.04(후보)', description: '25년도 4월 개발 대상 후보 목록 입니다.' }
+    { id: 2501, name: '25.01', description: '25년도 1월 개발 대상 목록 입니다.' },
+    { id: 2503, name: '25.03(후보)', description: '25년도 3월 개발 대상 후보 목록 입니다.' },
+    { id: 2504, name: '25.04(후보)', description: '25년도 4월 개발 대상 후보 목록 입니다.' }
   ]);
   
   const route = useRoute();
+  const showLayout = computed(() => route.path !== '/'); // !!
 
   const addNewItem = (newItem) => {
+    if (!newItem || !newItem.id || !newItem.name) {
+        console.error('잘못된 데이터 추가 시도 중임. 확인해보셈',newItem);
+        return;
+    }
+
     console.log('📌 [App.vue] addNewItem 호출됨', newItem);
     nameList.value.push(newItem);
   };
