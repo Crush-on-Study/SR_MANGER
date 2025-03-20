@@ -1,22 +1,95 @@
-<template>
+ <template>
     <div class="modal-overlay" @click.self="$emit('close')">
       <div class="modal-content">
-        <p>{{ detailInfo.ref_no }}</p>
-        <h3>{{ detailInfo.title }}</h3>
-  
-        <!-- ✅ 체크리스트 (세로 정렬) -->
-        <!-- <div class="checkbox-list">
-          <label v-for="info in detailInfo" :key="info" class="checkbox-item">
-            {{ info.id }}
-          </label>
-        </div> -->
-  
-        <button class="close-btn" @click="$emit('close')">X</button>
-  
+      <button class="close-btn" @click="$emit('close')">X</button>
+      <p class="text-date">{{ detailInfo.req_dt }} </p>
+      <div class="text-xl font-bold mb-2"><strong>Ref.{{ detailInfo.ref_no }}</strong></div>
+      <h2 class="text-xl font-bold mb-2">2025 G.BSC Request</h2>
+
+      <div class="div-line"></div>
+      
+      <div class="flex justify-between items-center text-sm mb-4">
+        <div>
+          <span class="font-semibold mr-2">Label:     </span>
+          <span class="px-2 py-1 bg-red-500 text-white text-xs rounded">{{ detailInfo.kind }}</span>
+          </div>
+      </div>
+      
+      <div class="mb-4">
+        <p>Applicant:     {{detailInfo.applicant}}</p>
+        <p>Attachments:     <span class="text-blue-500 cursor-pointer">SR Request File</span></p>
+      </div>
+
+      <div class="mb-4">
+        <p>Importance</p>
+        <!-- !Remark: importance drop box 들어가야함 -->
+      </div>
+
+      <div class="div-line"></div>
+
+      <div class="text-xl font-bold mb-2"><strong>Approval Comments</strong></div>
+
+      <div class="mb-6 border border-gray-300 rounded-lg overflow-hidden">
+      <table class="w-full border-collapse text-sm">
+        <thead>
+          <tr class="bg-gray-200 border-b border-gray-300">
+            <th class="border-r border-gray-300 p-2"></th>
+            <th class="border-r border-gray-300 p-2"></th>
+            <th class="border-r border-gray-300 p-2"></th>
+            <th class="p-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- !Remark: v-for 문 처리 -->
+          <tr class="border-b border-gray-300 text-center">
+            <td class="border-r border-gray-300 p-2">Drafter</td>
+            <td class="border-r border-gray-300 p-2">{{ detailInfo.aprv1 }}</td>
+            <td class="border-r border-gray-300 p-2">Confirmed/Declined</td>
+            <td class="p-2">{{ detailInfo.aprv1_rmk }}</td>
+          </tr>
+          <tr class="border-b border-gray-300 text-center">
+            <td class="border-r border-gray-300 p-2">Team Leader</td>
+            <td class="border-r border-gray-300 p-2">{{ detailInfo.aprv2 }}</td>
+            <td class="border-r border-gray-300 p-2">Confirmed/Declined</td>
+            <td class="p-2">{{ detailInfo.aprv2_rmk }}</td>
+          </tr>
+          <tr class="border-b border-gray-300 text-center">
+            <td class="border-r border-gray-300 p-2">S/R admin</td>
+            <td class="border-r border-gray-300 p-2">{{ detailInfo.aprv3 }}</td>
+            <td class="border-r border-gray-300 p-2">Confirmed/Declined</td>
+            <td class="p-2">{{ detailInfo.aprv3_rmk }}</td>
+          </tr>
+          <tr class="border-b border-gray-300 text-center">
+            <td class="border-r border-gray-300 p-2">S/R Leader</td>
+            <td class="border-r border-gray-300 p-2">{{ detailInfo.aprv4 }}</td>
+            <td class="border-r border-gray-300 p-2">Confirmed/Declined</td>
+            <td class="p-2">{{ detailInfo.aprv4_rmk }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+      
+    <div class="div-line"></div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block font-medium">Remark</label>
+          <p><input type="text" class="w-full p-2 border rounded-md" placeholder="Input text" /></p>
+        </div>
+        <div>
+          <label class="block font-medium">AMS Remark</label>
+          <p><input type="text" class="w-full p-2 border rounded-md" placeholder="Input text" /></p>
+        </div>
+        <div>
+          <label class="block font-medium">DT Remark</label>
+          <span class="text-blue-500 cursor-pointer">📄 SR 보완 정리.pptx</span>
+          <p><input type="text" class="w-full p-2 border rounded-md" placeholder="Input text" /></p>
+        </div>
+      </div>
       </div>
     </div>
   </template>
-  
+
   <script setup>
   import { defineProps } from 'vue';
   
@@ -27,6 +100,16 @@
   </script>
   
   <style scoped>
+  .text-date {
+    font-size: 12px;
+    color: #888686;
+  }
+
+  .div-line{
+    border-top: 1px solid lightgray;
+    margin: 30px 0;
+  }
+  
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -43,7 +126,7 @@
     background: white;
     padding: 20px;
     border-radius: 10px;
-    width: 300px;
+    width: 700px;
     position: relative;
   }
   
