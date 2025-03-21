@@ -47,59 +47,63 @@
   </template>
   
 
-<script setup>
-import { ref, defineProps, defineEmits } from 'vue';
-import Button from './Button.vue';
-
-const props = defineProps({
-  nameList: Array, // ✅ App.vue에서 전달받음
-});
-
-const isNewListModalOpen = ref(false);
-const newListName = ref('');
-const newListDescription = ref('');
-const checkedItems = ref([]); // ✅ 체크된 항목 저장
-
-const emit = defineEmits(['addNewItem', 'addToCard']);
-
-const createNewList = () => {
-  if (!newListName.value.trim()) {
-    alert("Name은 필수 입력 사항입니다!");
-    return;
-  }
-
-  const newItem = { name: newListName.value, description: newListDescription.value };
-
-  console.log("📌 [Modal.vue] createNewList 실행됨", newItem);
+  <script setup>
+  import { ref, defineProps, defineEmits, onMounted } from 'vue';
+  import { addDevelopmentCard, addSRToCard, getDevelopmentCards } from "../../backend/firestoreService.js";
+  import Button from './Button.vue';
   
-  // ✅ 새로운 목록을 App.vue에 전달 (전역 관리)
-  emit('addNewItem', newItem);
-
-  console.log("✅ [Modal.vue] addNewItem 이벤트 발생", newItem);
-
-  // 입력값 초기화 및 모달 닫기
-  newListName.value = '';
-  newListDescription.value = '';
-  isNewListModalOpen.value = false;
-};
-
-// ✅ 카드에 추가 버튼 클릭 시 동작
-const handleAddToCard = () => {
-  if (checkedItems.value.length === 0) {
-    alert("최소 하나 이상의 목록을 선택하세요!");
-    return;
-  }
-
-  console.log("📌 [Modal.vue] 선택된 항목:", checkedItems.value);
+  const props = defineProps({
+    selectedSRs: Array,  // ✅ 체크한 SR 리스트
+  });
   
-  // ✅ 선택된 목록을 부모 컴포넌트에 전달
-  emit('addToCard', checkedItems.value);
-
-  // ✅ 체크된 목록 초기화 및 모달 닫기
-  checkedItems.value = [];
-  emit('close');
-};
-</script>
+  const isNewListModalOpen = ref(false);
+  const newListName = ref('');
+  const newListDescription = ref('');
+  const checkedItems = ref([]);
+  const nameList = ref([]);  // ✅ Firestore에서 가져온 카드 리스트
+  
+  const emit = defineEmits(['close', 'refreshCards']);
+  
+  // ✅ Firestore에서 개발 목록 불러오기
+  const fetchCards = async () => {
+    nameList.value = await getDevelopmentCards();
+  };
+  
+  onMounted(fetchCards);
+  
+  // ✅ 새로운 개발 목록 추가
+  const createNewList = async () => {
+    if (!newListName.value.trim()) {
+      alert("⚠️ 이름을 입력해주세요!");
+      return;
+    }
+  
+    const newCard = await addDevelopmentCard(newListName.value, newListDescription.value);
+    if (newCard) {
+      nameList.value.push(newCard);
+      isNewListModalOpen.value = false;
+      newListName.value = '';
+      newListDescription.value = '';
+      emit('refreshCards');  // ✅ Development.vue 새로고침 트리거
+    }
+  };
+  
+  // ✅ 체크한 SR을 특정 카드에 추가
+  const handleAddToCard = async () => {
+    if (checkedItems.value.length === 0) {
+      alert("⚠️ 최소 하나의 카드를 선택해주세요!");
+      return;
+    }
+  
+    for (const cardId of checkedItems.value) {
+      await addSRToCard(cardId, props.selectedSRs);
+    }
+  
+    alert("✅ 카드에 SR 추가 완료!");
+    emit('close');
+  };
+  </script>
+  
 
 <style scoped>
 .modal-overlay {

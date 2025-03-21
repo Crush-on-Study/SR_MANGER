@@ -45,61 +45,35 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue';
+import { getDevelopmentCards, deleteDevelopmentCard } from "../../backend/firestoreService.js";
 import Button from '../../components/widgets/Button.vue';
 import Modal from '../../components/widgets/Modal.vue';
-import Modal2 from '../../components/widgets/Modal2.vue';
-import DonutChart from '../../components/widgets/DonutChart.vue'; // ✅ 도넛 차트 추가
+import DonutChart from '../../components/widgets/DonutChart.vue';
 
-const route = useRoute();
+const nameList = ref([]);
+const isModalOpen = ref(false);
 
-// ✅ 개발 목록 데이터 (Service Type 비율 포함)
-const nameList = ref([
-  { id: "2501", name: "25.01", description: "25년도 1월 개발 대상 목록 입니다.", serviceTypes: { ICC: 50, RPA: 30, EKMTC: 20 } },
-  { id: "2503", name: "25.03(후보)", description: "25년도 3월 개발 대상 후보 목록 입니다.", serviceTypes: { ICC: 60, RPA: 20, EKMTC: 20 } },
-  { id: "2504", name: "25.04(후보)", description: "25년도 4월 개발 대상 후보 목록 입니다.", serviceTypes: { ICC: 40, RPA: 40, EKMTC: 20 } },
-]);
+// ✅ Firestore에서 카드 목록 불러오기
+const fetchDevelopmentCards = async () => {
+  nameList.value = await getDevelopmentCards();
+};
 
-// ✅ 실제 SR 요청 데이터
-const requestData = ref([
-  { id: 12345, title: "VEP 제약 조건 추가의 건", domain: "CC", serviceType: "ICC", requestDate: "2025-03-11", estimatedHours: 17, importance: "필수 개발 대상" },
-  { id: 15346, title: "e-billing 확대", domain: "SO", serviceType: "RPA", requestDate: "2025-02-09", estimatedHours: 58, importance: "긴급 - 중요도 상" },
-  { id: 428215, title: "unplanned report 정리 개선", domain: "DT", serviceType: "ICC", requestDate: "2024-10-29", estimatedHours: 23, importance: "필수 개발 대상" },
-  { id: 731205, title: "부산 터미널 × eBilling", domain: "SO", serviceType: "RPA", requestDate: "2025-01-23", estimatedHours: 41, importance: "비긴급 - 중요도 하" },
-  { id: 872019, title: "보안 강화 패치 적용", domain: "SEC", serviceType: "ICC", requestDate: "2025-09-01", estimatedHours: 29, importance: "필수 개발 대상" },
-]);
+onMounted(fetchDevelopmentCards);
 
-// ✅ Service Type 비율 계산 (도넛 차트용)
-const serviceData = computed(() => {
-  const counts = {};
-  requestData.value.forEach(item => {
-    if (!counts[item.serviceType]) {
-      counts[item.serviceType] = 0;
-    }
-    counts[item.serviceType]++;
-  });
+// ✅ 카드 삭제
+const deleteCard = async (cardId, index) => {
+  await deleteDevelopmentCard(cardId);
+  nameList.value.splice(index, 1);
+};
 
-  return Object.keys(counts).map(type => ({
-    serviceType: type,
-    count: counts[type]
-  }));
-});
-
-// ✅ "필수 개발 대상" 개수 & 총 공수시간 집계
-const priorityCount = computed(() => 
-  requestData.value.filter(item => item.importance === "필수 개발 대상").length
-);
-const priorityHours = computed(() => 
-  requestData.value.reduce((sum, item) => sum + (item.importance === "필수 개발 대상" ? item.estimatedHours : 0), 0)
-);
-
-// ✅ 모달 상태 관리
-const isModal1Open = ref(false);
-const isModal2Open = ref(false);
-const closeModal1 = () => { isModal1Open.value = false; };
-const closeModal2 = () => { isModal2Open.value = false; };
+// ✅ 모달 닫고 카드 리스트 새로고침
+const closeModal = () => {
+  isModalOpen.value = false;
+  fetchDevelopmentCards();
+};
 </script>
+
 
 <style scoped>
 .development-container {

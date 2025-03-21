@@ -14,7 +14,12 @@
 
     <!-- ✅ 개발 대상 추가 버튼 -->
     <div class="button-container">
-      <Button label="+ 개발 대상 추가" type="primary" @click="handleAddTarget" />
+      <Button 
+        label="+ 개발 대상 추가" 
+        type="primary" 
+        @click="handleAddTarget" 
+        :disabled="!isAnyChecked"
+      />
     </div>
 
     <!-- ✅ 테이블 -->
@@ -87,7 +92,12 @@ const items = ref([]);
 
 // ✅ Firestore에서 데이터를 가져와 `items`에 저장
 const fetchPrioritySRRequests = async () => {
-  items.value = await getPrioritySRRequests();
+  const data = await getPrioritySRRequests();
+  // ✅ Firestore 데이터에 isChecked 기본값 추가
+  items.value = data.map(item => ({
+    ...item,
+    isChecked: false, // 체크박스 기본값 설정
+  }));
   console.log("📌 Firestore에서 가져온 Priority 데이터:", items.value);
 };
 
@@ -121,15 +131,52 @@ const filteredItems = computed(() => {
   ));
 });
 
-// ✅ 체크박스 관련 로직
+// ✅ 체크박스 전체 선택 기능
 const allChecked = computed({
-  get: () => items.value.every((item) => item.isChecked),
+  get: () => items.value.length > 0 && items.value.every((item) => item.isChecked),
   set: (value) => items.value.forEach((item) => (item.isChecked = value)),
 });
 
-// ✅ 선택된 아이템 목록
+// ✅ 체크된 아이템 목록
 const selectedItems = computed(() => items.value.filter(item => item.isChecked));
 const isAnyChecked = computed(() => selectedItems.value.length > 0);
+
+// ✅ 전체 Total 계산
+const totalHours = computed(() => {
+  return Object.values(totalHoursByDomain.value).reduce((sum, value) => sum + value, 0);
+});
+
+
+// ✅ 개발 대상 추가 버튼 클릭 이벤트
+const isModalOpen = ref(false);
+const handleAddTarget = () => {
+  if (!isAnyChecked.value) {
+    alert("최소 1개 이상의 S/R을 선택하세요.");
+    return;
+  }
+  openModal();
+};
+
+// ✅ 모달 열기
+const openModal = () => {
+  isModalOpen.value = true;
+};
+
+// ✅ 개발 목록에 추가
+const addNewItem = (selectedItems) => {
+  console.log("✅ 추가할 아이템:", selectedItems);
+  isModalOpen.value = false;
+};
+
+// ✅ 상세 모달 열기
+const isDetailModalOpen = ref(false);
+const detailInfo = ref({});
+const openDetailModal = (id) => {
+  const selectedIdDetails = items.value.find((item) => item.ref_no === id);
+  if (!selectedIdDetails) return;
+  detailInfo.value = selectedIdDetails;
+  isDetailModalOpen.value = true;
+};
 
 // ✅ 도메인별 Estimated Hours 집계
 const totalHoursByDomain = computed(() => {
@@ -143,31 +190,6 @@ const totalHoursByDomain = computed(() => {
   return hours;
 });
 
-// ✅ 전체 Total 계산
-const totalHours = computed(() => {
-  return Object.values(totalHoursByDomain.value).reduce((sum, value) => sum + value, 0);
-});
-
-// ✅ 모달 열기
-const isModalOpen = ref(false);
-const openModal = () => {
-  isModalOpen.value = true;
-};
-
-// ✅ 개발 목록에 추가
-const addNewItem = (selectedItems) => {
-  isModalOpen.value = false;
-};
-
-// ✅ 상세 모달 열기
-const isDetailModalOpen = ref(false);
-const detailInfo = ref({});
-const openDetailModal = (id) => {
-  const selectedIdDetails = items.value.find((item) => item.ref_no === id);
-  if (!selectedIdDetails) return;
-  detailInfo.value = selectedIdDetails;
-  isDetailModalOpen.value = true;
-};
 </script>
 
 

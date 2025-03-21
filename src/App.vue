@@ -1,9 +1,3 @@
-<!-- 2025/03/20 리팩토링 설명 드립니다.-->
- <!-- 작업자 : HB Kang -->
-<!-- 1. SM님이 애용하시는 computed 속성 활용해서 route에 직접 접근하는 것을 showLayout 변수에다 computed를 써서 path에 조건을 걸어봤습니다. -->
- <!-- 사유 : 규모는 작은애라 사실 성능상 문제는 없을거 같은데, 코드 통일성을 위해 넣었습니다.  -->
-
-
 <template>
     <div class="app-layout">
       <!-- ✅ 헤더 (전체 상단) -->
@@ -56,7 +50,7 @@
 html, body {
   width: 100vw;
   height: 100vh;
-  overflow: hidden; /* 스크롤 없애기 */
+  overflow-y: auto; /* 스크롤 없애기 */
 }
 
   .app-layout {
@@ -109,7 +103,7 @@ html, body {
     height: 100%;
     background-color: #f5f6fa;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-y: auto;
   }
   </style>
   
