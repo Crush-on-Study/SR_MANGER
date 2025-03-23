@@ -1,19 +1,19 @@
 <template>
   <div class="development-container">
     <div class="header">
-      <h2> S/R 요청 카드 리스트</h2>
+      <h2>S/R 요청 카드 리스트</h2>
     </div>
 
     <div class="btn_new">
-        <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class"/>
+      <Button label="+ NEW" type="primary" @click="isModal2Open = true" class="btn-class" />
     </div>
 
     <!-- ✅ 리스트 출력 -->
     <div class="list-container">
-      <div 
-        v-for="(item, index) in nameList" 
-        :key="index" 
-        class="list-item" 
+      <div
+        v-for="(item, index) in nameList"
+        :key="item.id"
+        class="list-item"
         @click="$router.push(`/development/${item.id}`)"
       >
         <div class="content">
@@ -25,34 +25,42 @@
         <div class="chart-summary">
           <DonutChart :data="item.serviceTypes" />
           <div class="priority-summary">
-            <p>✅ 필수 개발 대상: <b>{{ priorityCount }}건</b></p>
-            <p>📊 총 공수 시간: <b>{{ priorityHours }}h</b></p>
+            <p>✅ 필수 개발 대상: <b>{{ getPriorityCount(item) }}건</b></p>
+            <p>📊 총 공수 시간: <b>{{ getPriorityHours(item) }}h</b></p>
           </div>
         </div>
 
         <!-- ✅ 수정 & 삭제 버튼 -->
         <div class="actions">
           <button class="edit-btn" @click.stop="isModal1Open = true">⚙️</button>
-          <button class="delete-btn" @click.stop="nameList.splice(index, 1)">🗑️</button>
+          <button class="delete-btn" @click.stop="deleteCard(item.id, index)">🗑️</button>
         </div>
       </div>
     </div>
 
     <!-- ✅ 개발 목록 추가 모달 -->
     <Modal v-if="isModal1Open" title="개발 목록 추가" @close="closeModal1" />
-    <Modal2 v-if="isModal2Open" title="신규 목록 추가" @close="closeModal2" />
+    <Modal2 v-if="isModal2Open" :isOpen="isModal2Open" @close="closeModal2" @create="handleCreate" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { getDevelopmentCards, deleteDevelopmentCard } from "../../backend/firestoreService.js";
-import Button from '../../components/widgets/Button.vue';
-import Modal from '../../components/widgets/Modal.vue';
-import DonutChart from '../../components/widgets/DonutChart.vue';
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import Button from "../../components/widgets/Button.vue";
+import Modal from "../../components/widgets/Modal.vue";
+import Modal2 from "../../components/widgets/Modal2.vue";
+import DonutChart from "../../components/widgets/DonutChart.vue";
+import { getDevelopmentCards, deleteDevelopmentCard, addDevelopmentCard } from "../../backend/firestoreService.js";
 
+const router = useRouter();
 const nameList = ref([]);
-const isModalOpen = ref(false);
+const isModal1Open = ref(false);
+const isModal2Open = ref(false);
+
+// ✅ 필수 개발 대상 개수 및 총 공수시간 계산 (각 카드별 적용)
+const getPriorityCount = (card) => card.priorityCount || 0;
+const getPriorityHours = (card) => card.priorityHours || 0;
 
 // ✅ Firestore에서 카드 목록 불러오기
 const fetchDevelopmentCards = async () => {
@@ -63,14 +71,43 @@ onMounted(fetchDevelopmentCards);
 
 // ✅ 카드 삭제
 const deleteCard = async (cardId, index) => {
-  await deleteDevelopmentCard(cardId);
-  nameList.value.splice(index, 1);
+  const success = await deleteDevelopmentCard(cardId);
+  if (success) {
+    nameList.value.splice(index, 1);
+  } else {
+    alert("카드 삭제에 실패했습니다.");
+  }
 };
 
-// ✅ 모달 닫고 카드 리스트 새로고침
-const closeModal = () => {
-  isModalOpen.value = false;
+// ✅ Modal1 닫기
+const closeModal1 = () => {
+  isModal1Open.value = false;
   fetchDevelopmentCards();
+};
+
+// ✅ Modal2 닫기
+const closeModal2 = () => {
+  isModal2Open.value = false;
+};
+
+// ✅ 새로운 개발 카드 생성
+const handleCreate = async (formData) => {
+  const newCard = {
+    name: formData.name,
+    description: formData.description || "",
+    applyingMonth: formData.applyingMonth,
+    serviceTypes: formData.serviceTypes,
+    image: "https://via.placeholder.com/150", // 더미 이미지
+    priorityCount: 0, // 초기값
+    priorityHours: 0, // 초기값
+  };
+
+  const success = await addDevelopmentCard(newCard);
+  if (success) {
+    await fetchDevelopmentCards(); // 데이터 새로고침
+  } else {
+    alert("개발 카드 생성에 실패했습니다.");
+  }
 };
 </script>
 

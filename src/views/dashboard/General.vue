@@ -9,14 +9,7 @@
       :domainOptions="['CC', 'CS', 'SO', 'VO']"
       :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
       :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
-      :importanceOptions="[
-        '비긴급 - 중요도 하', 
-        '비긴급 - 중요도 상', 
-        '긴급 - 중요도 하', 
-        '긴급 - 중요도 상', 
-        '필수 개발 대상', 
-        '미지정'
-      ]"
+      :importanceOptions="[ '비긴급 - 중요도 하', '비긴급 - 중요도 상', '긴급 - 중요도 하', '긴급 - 중요도 상', '필수 개발 대상', '미지정']"
       @search="handleSearch"
     />
 
@@ -31,22 +24,14 @@
         <thead>
           <tr>
             <th><input type="checkbox" v-model="allChecked" @change="toggleAll" /></th>
-            <th>Ref.no</th>
-            <th>Domain</th>
-            <th>Title</th>
-            <th>Status</th>
-            <th>Service Type</th>
-            <th>Request Date</th>
-            <th>Estimated Hours</th>
-            <th>중요도</th>
+            <th v-for="col in columns" :key="col.key" @click="sortTable(col.key)">
+              {{ col.label }}
+              <span v-if="sortKey === col.key">{{ sortOrder === 'asc' ? '▲' : '▼' }}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
-          <tr 
-            v-for="(item) in filteredItems" 
-            :key="item.ref_no"
-            :class="{ 'highlight-mandatory': item.importance === '필수 개발 대상' }"
-          >
+          <tr v-for="item in sortedFilteredItems" :key="item.ref_no" :class="{ 'highlight-mandatory': item.importance === '필수 개발 대상' }">
             <td><input type="checkbox" v-model="item.isChecked" /></td>
             <td>{{ item.ref_no }}</td>
             <td>{{ item.domain }}</td>
@@ -55,7 +40,11 @@
             <td>{{ item.serviceType }}</td>
             <td>{{ item.requestDate }}</td>
             <td>{{ item.estimatedHours }}</td>
-            <td>{{ item.importance }}</td>
+            <td>
+              <select v-model="item.importance" class="importance-input">
+                <option v-for="option in importanceOptions" :key="option" :value="option">{{ option }}</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -70,13 +59,14 @@
     </div>
 
     <!-- ✅ 모달 추가 -->
-    <Modal v-if="isModalOpen" title="개발 목록에 추가" :nameList="nameList" @close="isModalOpen = false" @addNewItem="addNewItem" />
+    <Modal v-if="isModalOpen" title="개발 목록에 추가" :nameList="nameList" :selectedSRs="selectedItems" @close="isModalOpen = false" @addNewItem="addNewItem" @addToCard="handleAddToCard" />
+    <DetailModal v-if="isDetailModalOpen" :detailInfo="detailInfo" @close="isDetailModalOpen = false" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { getGeneralSRRequests } from "../../backend/firestoreService.js";
+import { getGeneralSRRequests, getDevelopmentCards } from "../../backend/firestoreService.js";
 import SearchBar from "../../components/widgets/SearchBar.vue";
 import Button from "../../components/widgets/Button.vue";
 import Modal from "../../components/widgets/Modal.vue";
@@ -84,30 +74,93 @@ import StatusCard from "../../components/widgets/StatusCard.vue";
 
 // ✅ Firestore에서 가져온 데이터를 저장할 상태 변수
 const items = ref([]);
+const sortKey = ref(""); // 정렬 기준
+const sortOrder = ref("asc"); // asc(오름차순) / desc(내림차순)
+const nameList = ref([]); // 개발 카드 목록
+
+// ✅ 중요도 옵션 정의
+const importanceOptions = ref(['비긴급 - 중요도 하', '비긴급 - 중요도 상', '긴급 - 중요도 하', '긴급 - 중요도 상', '필수 개발 대상', '미지정']);
 
 // ✅ Firestore에서 데이터를 가져와 `items`에 저장
 const fetchGeneralSRRequests = async () => {
-  items.value = await getGeneralSRRequests();
-  console.log("📌 Firestore에서 가져온 General 데이터:", items.value);
+  const data = await getGeneralSRRequests();
+  items.value = data.map(item => ({
+    ...item,
+    isChecked: false,
+    importance: item.importance || '미지정' // 초기값을 '미지정'으로 설정
+  }));
+};
+
+// ✅ 개발 카드 목록 가져오기
+const fetchDevelopmentCards = async () => {
+  nameList.value = await getDevelopmentCards();
 };
 
 // ✅ 컴포넌트가 마운트될 때 Firestore 데이터 로드
-onMounted(fetchGeneralSRRequests);
+onMounted(() => {
+  fetchGeneralSRRequests();
+  fetchDevelopmentCards();
+});
+
+// ✅ 컬럼 정의 (정렬을 위함)
+const columns = ref([
+  { key: "ref_no", label: "Ref.no" },
+  { key: "domain", label: "Domain" },
+  { key: "title", label: "Title" },
+  { key: "status", label: "Status" },
+  { key: "serviceType", label: "Service Type" },
+  { key: "requestDate", label: "Request Date" },
+  { key: "estimatedHours", label: "Estimated Hours" },
+  { key: "importance", label: "중요도" },
+]);
+
+// ✅ 정렬 함수
+const sortTable = (key) => {
+  sortOrder.value = sortKey.value === key ? (sortOrder.value === "asc" ? "desc" : "asc") : "asc";
+  sortKey.value = key;
+};
 
 // ✅ 필터 상태 추가
 const filters = ref({
   searchText: '',
+  fromDate: '',
+  toDate: '',
   domain: '',
   status: '',
   serviceType: '',
   importance: ''
 });
 
+// ✅ 필터 적용 여부
 const filtersApplied = ref(false);
 
+// ✅ 필터 적용 함수
 const handleSearch = (searchFilters) => {
   Object.assign(filters.value, searchFilters);
   filtersApplied.value = true;
+
+  filteredItems.value = items.value.filter(item => {
+    // ✅ Ref.No와 Title 모두 검색
+    const searchTextMatch = !searchFilters.searchText ||
+      item.title.toLowerCase().includes(searchFilters.searchText.toLowerCase()) ||
+      item.ref_no.toString().includes(searchFilters.searchText);
+
+    // ✅ 날짜 필터링
+    const requestDate = new Date(item.requestDate);
+    const fromDate = searchFilters.fromDate ? new Date(searchFilters.fromDate) : null;
+    const toDate = searchFilters.toDate ? new Date(searchFilters.toDate) : null;
+
+    const dateMatch = (!fromDate || requestDate >= fromDate) &&
+                     (!toDate || requestDate <= toDate);
+
+    // ✅ 나머지 필터링 조건
+    const domainMatch = !searchFilters.domain || searchFilters.domain === "ALL" || item.domain === searchFilters.domain;
+    const statusMatch = !searchFilters.status || searchFilters.status === "ALL" || item.status === searchFilters.status;
+    const serviceTypeMatch = !searchFilters.serviceType || searchFilters.serviceType === "ALL" || item.serviceType === searchFilters.serviceType;
+    const importanceMatch = !searchFilters.importance || searchFilters.importance === "비긴급" || item.importance === searchFilters.importance;
+
+    return searchTextMatch && dateMatch && domainMatch && statusMatch && serviceTypeMatch && importanceMatch;
+  });
 };
 
 // ✅ 필터링된 리스트 계산
@@ -123,9 +176,23 @@ const filteredItems = computed(() => {
   ));
 });
 
+// ✅ 정렬된 & 필터링된 리스트 적용
+const sortedFilteredItems = computed(() => {
+  if (!sortKey.value) return filteredItems.value;
+
+  return [...filteredItems.value].sort((a, b) => {
+    const valueA = a[sortKey.value];
+    const valueB = b[sortKey.value];
+
+    return typeof valueA === "string"
+      ? (sortOrder.value === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA))
+      : (sortOrder.value === "asc" ? valueA - valueB : valueB - valueA);
+  });
+});
+
 // ✅ 체크박스 관련 로직
 const allChecked = computed({
-  get: () => items.value.every((item) => item.isChecked),
+  get: () => items.value.length > 0 && items.value.every((item) => item.isChecked),
   set: (value) => items.value.forEach((item) => (item.isChecked = value)),
 });
 
@@ -153,15 +220,33 @@ const totalHours = computed(() => {
 // ✅ 모달 열기
 const isModalOpen = ref(false);
 const openModal = () => {
+  if (!isAnyChecked.value) {
+    alert("최소 1개 이상의 S/R을 선택하세요.");
+    return;
+  }
   isModalOpen.value = true;
 };
 
 // ✅ 개발 목록에 추가
 const addNewItem = (selectedItems) => {
+  console.log("✅ 추가할 아이템:", selectedItems);
   isModalOpen.value = false;
 };
-</script>
 
+// ✅ Modal에서 카드에 추가 후 처리
+const handleAddToCard = (cardIds) => {
+  console.log("✅ 카드에 추가 완료, 선택된 카드 ID:", cardIds);
+  isModalOpen.value = false;
+  // 선택된 항목 체크 해제
+  items.value.forEach(item => {
+    if (item.isChecked) item.isChecked = false;
+  });
+};
+
+// ✅ 상세 모달 열기 (현재 사용되지 않음, 필요 시 구현)
+const isDetailModalOpen = ref(false);
+const detailInfo = ref({});
+</script>
 
 
 <style scoped>
@@ -219,6 +304,12 @@ th, td {
 
 th {
   background: #f1f1f1;
+  cursor: pointer;
+  user-select:none;
+}
+
+th:hover {
+  color: #007bff;
 }
 
 /* ✅ Total Hours 스타일 */
