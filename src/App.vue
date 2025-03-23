@@ -1,50 +1,50 @@
 <template>
-    <div class="app-layout">
-      <!-- ✅ 헤더 (전체 상단) -->
-      <Header v-if="showLayout" class="header" />
-  
-      <!-- ✅ 사이드바 + 메인 컨텐츠 래핑 -->
-      <div class="content-wrapper">
-        <Sidebar v-if="showLayout" class="sidebar" />
-  
-        <!-- ✅ 메인 컨텐츠 (남은 공간 차지) -->
-        <div class="main-content">
-          <RouterView :nameList="nameList" @addNewItem="addNewItem" />
-        </div>
+  <div class="app-layout">
+    <!-- ✅ 헤더 (전체 상단) -->
+    <Header v-if="showLayout" class="header" />
+
+    <!-- ✅ 사이드바 + 메인 컨텐츠 래핑 -->
+    <div class="content-wrapper">
+      <Sidebar v-if="showLayout" class="sidebar" />
+
+      <!-- ✅ 메인 컨텐츠 (남은 공간 차지) -->
+      <div class="main-content">
+        <RouterView :nameList="nameList" @addNewItem="addNewItem" />
       </div>
     </div>
-  </template>
-  
-  <script setup>
-  import { ref, computed } from 'vue';
-  import { RouterView, useRoute } from 'vue-router';
-  import Header from './components/layout/Header.vue';
-  import Sidebar from './components/layout/Sidebar.vue';
-  
-  const nameList = ref([
-    { id: 2501, name: '25.01', description: '25년도 1월 개발 대상 목록 입니다.' },
-    { id: 2503, name: '25.03(후보)', description: '25년도 3월 개발 대상 후보 목록 입니다.' },
-    { id: 2504, name: '25.04(후보)', description: '25년도 4월 개발 대상 후보 목록 입니다.' }
-  ]);
-  
-  const route = useRoute();
-  const showLayout = computed(() => route.path !== '/'); // !!
 
-  const addNewItem = (newItem) => {
-    if (!newItem || !newItem.id || !newItem.name) {
-        console.error('잘못된 데이터 추가 시도 중임. 확인해보셈',newItem);
-        return;
-    }
+    <!-- ✅ 푸터 (페이지 하단) -->
+    <Footer v-if="showLayout" class="footer" />
+  </div>
+</template>
 
-    console.log('📌 [App.vue] addNewItem 호출됨', newItem);
-    nameList.value.push(newItem);
-  };
-  </script>
-  
-  <style scoped>
-  /* ✅ 전체 레이아웃 (column 구조) */
+<script setup>
+import { ref, computed } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
+import Header from './components/layout/Header.vue';
+import Sidebar from './components/layout/Sidebar.vue';
+import Footer from './components/layout/Footer.vue';
+
+const route = useRoute();
+const showLayout = computed(() => route.path !== '/'); // 루트 경로에서는 레이아웃 숨김
+
+const nameList = ref([]); // nameList 초기화
+
+const addNewItem = (newItem) => {
+  if (!newItem || !newItem.id || !newItem.name) {
+    console.error('잘못된 데이터 추가 시도 중임. 확인해보셈', newItem);
+    return;
+  }
+
+  console.log('📌 [App.vue] addNewItem 호출됨', newItem);
+  nameList.value.push(newItem);
+};
+</script>
+
+<style scoped>
+/* ✅ 전체 레이아웃 (column 구조) */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html, body {
@@ -53,15 +53,15 @@ html, body {
   overflow-y: auto; /* 스크롤 없애기 */
 }
 
-  .app-layout {
-    display: flex;
-    flex-direction: column;
-    width: 100vw;
-    height: 100vh;
-  }
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 100vh; /* 최소 높이를 100vh로 설정 */
+}
 
-  /* ✅ 헤더 (전체 너비 차지) */
-  .header {
+/* ✅ 헤더 (전체 너비 차지) */
+.header {
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -74,20 +74,20 @@ html, body {
   transition: all 0.3s ease-in-out;
   padding: 10px;
 }
-  
-  /* ✅ 사이드바 + 메인 컨텐츠 감싸는 래퍼 */
-  .content-wrapper {
-    display: flex;
-    flex: 1; /* 부모 요소인 .app-layout에 맞춰 높이 자동 조정 */
-    width: 100%;
-    overflow: hidden;
-    gap: 10px;
-  }
-  
-  /* ✅ 사이드바 (왼쪽 고정) */
-  .sidebar {
+
+/* ✅ 사이드바 + 메인 컨텐츠 감싸는 래퍼 */
+.content-wrapper {
+  display: flex;
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+  width: 100%;
+  overflow: hidden;
+  gap: 10px;
+}
+
+/* ✅ 사이드바 (왼쪽 고정) */
+.sidebar {
   width: 280px;
-  height: 100vh;
+  height: 100%;
   background: linear-gradient(135deg, #ecf0f3, #ffffff);
   color: #2c3e50;
   padding: 20px;
@@ -95,15 +95,22 @@ html, body {
   display: flex;
   flex-direction: column;
 }
-  
-  /* ✅ 메인 컨텐츠 (남은 공간 차지) */
-  .main-content {
-    /* flex: 1; 남은 공간을 차지하도록 설정 */
-    width: 100%;
-    height: 100%;
-    background-color: #f5f6fa;
-    box-sizing: border-box;
-    overflow-y: auto;
-  }
-  </style>
-  
+
+/* ✅ 메인 컨텐츠 (남은 공간 차지) */
+.main-content {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f6fa;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* ✅ 푸터 (페이지 하단) */
+.footer {
+  background-color: #f8f9fa;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+  width: 100%;
+}
+</style>
