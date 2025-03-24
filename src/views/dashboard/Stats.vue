@@ -10,7 +10,7 @@
   </template>
   
   <script setup>
-  // 추가 로직이 필요 없으므로 비워둠
+  // 구현 예정
   </script>
   
   <style scoped>

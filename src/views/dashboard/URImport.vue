@@ -1,3 +1,4 @@
+<!-- src/views/URImport.vue -->
 <template>
     <div class="ur-import-container">
       <h2>📂 UR Import</h2>
@@ -16,20 +17,22 @@
   
       <p v-if="uploadedFileName" class="file-info">📁 {{ uploadedFileName }} 업로드 완료!</p>
   
-      <button v-if="processedData.length" class="save-btn" @click="saveToFirestore">
-        📡 Firestore에 저장
-      </button>
+      <div class="button-group">
+        <button v-if="processedData.length" class="save-btn" @click="saveToFirestore">
+          📡 Firestore에 저장
+        </button>
   
-      <button class="delete-btn" @click="deleteAllFirestoreData">
-        🔥 Firestore 전체 삭제
-      </button>
+        <button class="delete-btn" @click="deleteAllFirestoreData">
+          🔥 Firestore 전체 삭제
+        </button>
+      </div>
   
       <div v-if="deleteMessage" class="delete-message">
         <p>{{ deleteMessage }}</p>
       </div>
   
       <!-- 🔹 전처리된 데이터 미리보기 -->
-      <div v-if="processedData.length">
+      <div v-if="processedData.length" class="preview-section">
         <h3>📊 전처리된 데이터 (미리보기)</h3>
         <table>
           <thead>
@@ -149,8 +152,14 @@
   
   <style scoped>
   .ur-import-container {
-    text-align: center;
     padding: 20px;
+    text-align: left; /* 전체 컨테이너를 왼쪽 정렬 */
+  }
+  
+  h2 {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 30px; /* 제목과 Drag & Drop 박스 간 간격 */
   }
   
   .drop-zone {
@@ -158,6 +167,7 @@
     padding: 40px;
     cursor: pointer;
     transition: background 0.2s ease-in-out;
+    text-align: center;
   }
   
   .drop-zone:hover {
@@ -167,10 +177,17 @@
   .file-info {
     margin-top: 15px;
     font-weight: bold;
+    text-align: center;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Firestore 저장 버튼과 전체 삭제 버튼 간 간격 */
+    margin-top: 20px;
   }
   
   .save-btn {
-    margin-top: 15px;
     padding: 10px 15px;
     background: #2ecc71;
     color: white;
@@ -181,7 +198,6 @@
   }
   
   .delete-btn {
-    margin-top: 15px;
     padding: 10px 15px;
     background: #e74c3c;
     color: white;
@@ -195,6 +211,17 @@
     margin-top: 10px;
     font-weight: bold;
     color: #3498db;
+    text-align: center;
+  }
+  
+  .preview-section {
+    margin-top: 40px; /* 버튼 그룹과 미리보기 섹션 간 간격 */
+  }
+  
+  .preview-section h3 {
+    font-size: 20px;
+    color: #2c3e50;
+    margin-bottom: 15px;
   }
   
   table {
@@ -214,4 +241,3 @@
     font-weight: bold;
   }
   </style>
-  

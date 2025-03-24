@@ -58,6 +58,14 @@
       </span>
     </div>
 
+    <!-- 🔹 페이지네이션 컴포넌트 -->
+    <Pagination
+      :total-items="totalItems"
+      :items-per-page="itemsPerPage"
+      :current-page.sync="currentPage"
+      @update:currentPage="fetchRequests"
+    />
+
     <!-- ✅ 모달 추가 -->
     <Modal v-if="isModalOpen" title="개발 목록에 추가" :nameList="nameList" :selectedSRs="selectedItems" @close="isModalOpen = false" @addNewItem="addNewItem" @addToCard="handleAddToCard" />
     <DetailModal v-if="isDetailModalOpen" :detailInfo="detailInfo" @close="isDetailModalOpen = false" />
