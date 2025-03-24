@@ -1,0 +1,46 @@
+/* src/assets/style.css */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow-y: auto;
+    color: #333; /* 기본 텍스트 색상 */
+  }
+  
+  /* 기본 링크 스타일 */
+  a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  
+  /* 기본 버튼 스타일 */
+  button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+  }
+  
+  /* 기본 테이블 스타일 */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  /* 기본 입력 필드 스타일 */
+  input, textarea {
+    font-family: inherit;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 8px;
+  }
+  
+  /* 컨테이너 최대 너비 */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }

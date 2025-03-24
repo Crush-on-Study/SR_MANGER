@@ -17,8 +17,8 @@ const firebaseConfig = {
 
 console.log("📌 Firestore 환경 변수 확인:", firebaseConfig);  // ✅ 디버깅용 로그 추가
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+const app = initializeApp(firebaseConfig); // 초기화
+const db = getFirestore(app); // DB 인스턴스
+const auth = getAuth(app); // 계정 인스턴스
 
 export { db, auth };

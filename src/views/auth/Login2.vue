@@ -1,3 +1,4 @@
+<!-- src/views/auth/Login2.vue -->
 <template>
     <div class="login-container">
       <div class="login-box">
@@ -7,14 +8,14 @@
             <label>Email</label>
             <div class="input-wrapper">
               <input type="email" v-model="email" required />
-              <span class="icon">&#9993;</span>
+              <span class="icon">✉</span>
             </div>
           </div>
           <div class="input-group">
             <label>Password</label>
             <div class="input-wrapper">
               <input type="password" v-model="password" required />
-              <span class="icon">&#128274;</span>
+              <span class="icon">🔒</span>
             </div>
           </div>
           <div class="options">
@@ -30,45 +31,66 @@
     </div>
   </template>
   
-  <script>
-  import { ref } from 'vue';
+  <script setup>
+  import { ref, provide } from 'vue';
   import { useRouter } from 'vue-router';
+  import { signInWithEmailAndPassword } from 'firebase/auth';
+  import { doc, getDoc } from 'firebase/firestore';
+  import { auth, db } from '../../backend/firebase.js';
   import Button from '../../components/widgets/Button.vue';
   
-  export default {
-    components: { Button },
-    setup() {
-      const email = ref('');
-      const password = ref('');
-      const rememberMe = ref(false);
-      const router = useRouter();
+  const email = ref('');
+  const password = ref('');
+  const rememberMe = ref(false);
+  const router = useRouter();
   
-      const handleLogin = () => {
-        if (email.value && password.value) {
-          console.log('로그인 성공:', email.value);
-          router.push('/priority');
-        } else {
-          alert('이메일과 비밀번호를 입력하세요.');
-        }
-      };
+  // 사용자 정보 상태
+  const user = ref(null);
   
-      return {
-        email,
-        password,
-        rememberMe,
-        handleLogin
-      };
+  // provide를 사용하여 사용자 정보를 하위 컴포넌트에 전달
+  provide('user', user);
+  
+  const handleLogin = async () => {
+    try {
+      console.log('📌 [Login2.vue] 로그인 시도:', email.value);
+  
+      // Firebase Authentication으로 로그인
+      const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+      const firebaseUser = userCredential.user;
+      console.log('✅ [Login2.vue] 로그인 성공, UID:', firebaseUser.uid);
+  
+      // Firestore에서 사용자 정보 가져오기
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        console.log('✅ [Login2.vue] 사용자 정보 가져오기 성공:', userData);
+  
+        // 사용자 정보 저장
+        user.value = {
+          uid: firebaseUser.uid,
+          email: userData.email,
+          name: userData.name,
+          department: userData.department,
+          role: userData.role,
+        };
+  
+        // localStorage에 사용자 정보 저장 (로그인 상태 유지)
+        localStorage.setItem('user', JSON.stringify(user.value));
+      } else {
+        console.error('❌ [Login2.vue] 사용자 정보가 Firestore에 존재하지 않음, UID:', firebaseUser.uid);
+        throw new Error('사용자 정보를 찾을 수 없습니다.');
+      }
+  
+      // 로그인 성공 시 리다이렉트
+      router.push('/priority');
+    } catch (error) {
+      console.error('❌ [Login2.vue] 로그인 실패:', error.message);
+      alert('로그인 실패: ' + error.message);
     }
   };
   </script>
   
   <style scoped>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
   .login-container {
     display: flex;
     justify-content: center;
@@ -163,4 +185,3 @@
     font-weight: bold;
   }
   </style>
-  

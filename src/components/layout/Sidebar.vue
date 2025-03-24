@@ -1,12 +1,13 @@
+<!-- src/components/layout/Sidebar.vue -->
 <template>
     <nav class="sidebar">
       <!-- ✅ 프로필 영역 -->
       <div class="profile-section">
         <img class="profile-img" src="/src/assets/profile.jpg" alt="Profile" />
         <div class="profile-info">
-          <h3>Hyun Bin Kang</h3>
-          <p>DT</p>
-          <p>Manager</p>
+          <h3>{{ user?.name || 'Guest' }}</h3>
+          <p>{{ user?.department || 'N/A' }}</p>
+          <p>{{ user?.role || 'N/A' }}</p>
         </div>
       </div>
   
@@ -32,10 +33,14 @@
   </template>
   
   <script setup>
+  import { inject } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   
   const router = useRouter();
   const route = useRoute();
+  
+  // App.vue에서 제공한 사용자 정보 주입
+  const user = inject('user');
   
   const navigate = (path) => {
     router.push(path);
@@ -43,7 +48,6 @@
   </script>
   
   <style scoped>
-  /* ✅ 프로필 섹션 */
   .profile-section {
     display: flex;
     flex-direction: column;
@@ -74,7 +78,6 @@
     color: #7f8c8d;
   }
   
-  /* ✅ 메뉴 리스트 */
   .menu-list {
     list-style: none;
     padding: 0;
@@ -98,7 +101,6 @@
     background: rgba(52, 152, 219, 0.2);
   }
   
-  /* ✅ 아이콘 & 텍스트 스타일 */
   .icon {
     font-size: 18px;
     display: flex;
@@ -111,10 +113,8 @@
     align-items: center;
   }
   
-  /* ✅ 활성화된 메뉴 스타일 */
   .active {
     font-weight: bold;
     color: #2980b9;
   }
   </style>
-  
