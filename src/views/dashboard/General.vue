@@ -8,7 +8,7 @@
       <SearchBar
         class="searchbar"
         :domainOptions="['PN','SA','CS','SC','VO','MA','FN','CM','HR','ST']"
-        :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
+        :statusOptions="['Request', 'Approved', 'In Progress', 'Rejected', 'Closed', 'Testing', 'DT Approved', ' Reconsider', 'Declined', 'Completed']"
         :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
         :importanceOptions="['비긴급 - 중요도 하', '비긴급 - 중요도 상', '긴급 - 중요도 하', '긴급 - 중요도 상', '필수 개발 대상', '미지정']"
         @search="handleSearch"

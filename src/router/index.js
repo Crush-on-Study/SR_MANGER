@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Login2 from '../views/auth/Login2.vue';
+import Login from '../views/auth/Login.vue';
 import Priority from '../views/dashboard/Priority.vue';
 import General from '../views/dashboard/General.vue';
 import Development from '../views/dashboard/Development.vue';
@@ -8,7 +8,7 @@ import URImport from '../views/dashboard/URImport.vue'; // ✅ 추가
 import Stats from "../views/dashboard/Stats.vue";
 
 const routes = [
-  { path: '/', component: Login2 },
+  { path: '/', component: Login },
   { path: '/priority', component: Priority },
   { path: '/general', component: General },
   { path: '/development', component: Development },

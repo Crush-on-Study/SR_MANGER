@@ -9,7 +9,7 @@
     <SearchBar
       class="searchbar"
       :domainOptions="['CC', 'SO']"
-      :statusOptions="['Request', 'Approved', 'In Progress', 'Finished', 'Rejected']"
+      :statusOptions="['Request', 'Approved', 'In Progress', 'Rejected', 'Closed', 'Testing', 'DT Approved', ' Reconsider', 'Declined', 'Completed']"
       :serviceTypeOptions="['ICC', 'RPA', 'E-KMTC']"
       @search="handleSearch"
     />
@@ -45,7 +45,7 @@
             <td><StatusCard :status="item.status" /></td>
             <td>{{ item.serviceType }}</td>
             <td>{{ item.requestDate }}</td>
-            <td>{{ item.estimatedHours }}</td>
+            <td>{{ item.estimatedHours || 0}}</td>
             <td>
               <select v-model="item.mandatory" class="mandatory-input">
                 <option>Y</option>
