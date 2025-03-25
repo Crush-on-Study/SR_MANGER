@@ -14,10 +14,11 @@
         <span>RPA: {{ totalHours.RPA }} hours</span>
       </div>
   
-      <!-- ✅ Download & Commit 버튼 -->
+      <!-- ✅ Download & Commit & 전체 삭제 버튼 -->
       <div class="button-group">
         <Button label="📥 Download" type="secondary" @click="downloadExcel" />
         <Button label="✅ Commit" type="primary" @click="commitData" />
+        <Button label="🗑️ 전체 삭제" type="danger" @click="deleteAllItems" />
       </div>
   
       <!-- ✅ 메인 테이블 -->
@@ -152,13 +153,13 @@
   import { ref, computed, onMounted } from "vue";
   import { useRoute, useRouter } from "vue-router";
   import Button from "../../components/widgets/Button.vue";
-  import { getCardSRRequests, deleteSRFromCard, getDevelopmentCards } from "../../backend/firestoreService.js";
+  import { getCardSRRequests, deleteSRFromCard, getDevelopmentCards, deleteAllSRFromCard } from "../../backend/firestoreService.js";
   import * as XLSX from "xlsx";
   import { saveAs } from "file-saver";
   
   const route = useRoute();
   const router = useRouter();
-  const cardId = route.params.id; // URL에서 카드 ID 가져올거임
+  const cardId = route.params.id; // URL에서 카드 ID 가져오기
   
   // ✅ 선택한 카드 정보
   const selectedItem = ref({ name: "목록 없음" });
@@ -302,6 +303,34 @@
       await fetchSRRequests();
     } else {
       alert("삭제에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+  
+  // ✅ 전체 SR 삭제 (Firestore에서 모든 SR 삭제)
+  const deleteAllItems = async () => {
+    if (mainTableData.value.length === 0) {
+      alert("삭제할 데이터가 없습니다.");
+      return;
+    }
+  
+    // 사용자에게 삭제 확인 메시지 표시
+    const confirmDelete = confirm("모든 SR 요청 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.");
+    if (!confirmDelete) return;
+  
+    try {
+      const success = await deleteAllSRFromCard(cardId);
+      if (success) {
+        // Firestore에서 삭제 성공 시, 클라이언트 상태 업데이트
+        mainTableData.value = [];
+        // Firestore와 동기화하기 위해 데이터 새로고침
+        await fetchSRRequests();
+        alert("모든 SR 요청 데이터가 삭제되었습니다.");
+      } else {
+        alert("전체 삭제에 실패했습니다. 다시 시도해주세요.");
+      }
+    } catch (error) {
+      console.error("❌ 전체 삭제 중 오류 발생:", error);
+      alert("전체 삭제 중 오류가 발생했습니다.");
     }
   };
   

@@ -1,5 +1,5 @@
 import { db } from "./firebase.js";
-import { startAfter, endBefore, collection, getDocs, query, doc, setDoc , deleteDoc, addDoc, writeBatch } from "firebase/firestore";
+import { startAfter, endBefore, collection, getDocs, query, doc, setDoc, deleteDoc, addDoc, writeBatch } from "firebase/firestore";
 
 // ✅ Firestore에 Priority S/R 요청 추가 함수 (CC, SO 도메인만)
 export const addPrioritySRRequest = async (srData) => {
@@ -39,80 +39,77 @@ export const saveSRRequestsToFirestore = async (processedData) => {
   }
 };
 
-
 // ✅ Firestore에서 Priority 데이터 가져오기 (CC, SO 도메인만)
 export const getPrioritySRRequests = async () => {
-    try {
-      const srCollection = collection(db, "sr_requests");
-      const querySnapshot = await getDocs(srCollection);
-      
-      let data = [];
-      querySnapshot.forEach((doc) => {
-        data.push(doc.data());
-      });
-  
-      console.log("📌 Firestore에서 가져온 Priority 데이터:", data);
-      return data;
-    } catch (error) {
-      console.error("❌ Firestore Priority 데이터 가져오기 실패:", error);
-      return [];
-    }
-  };
-  
-  // ✅ Firestore에서 General 데이터 가져오기 (나머지 도메인)
-  export const getGeneralSRRequests = async () => {
-    try {
-      const srCollection = collection(db, "sr_general_requests");
-      const querySnapshot = await getDocs(srCollection);
-      
-      let data = [];
-      querySnapshot.forEach((doc) => {
-        data.push(doc.data());
-      });
-  
-      console.log("📌 Firestore에서 가져온 General 데이터:", data);
-      return data;
-    } catch (error) {
-      console.error("❌ Firestore General 데이터 가져오기 실패:", error);
-      return [];
-    }
-  };
+  try {
+    const srCollection = collection(db, "sr_requests");
+    const querySnapshot = await getDocs(srCollection);
+    
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      data.push(doc.data());
+    });
 
+    console.log("📌 Firestore에서 가져온 Priority 데이터:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Firestore Priority 데이터 가져오기 실패:", error);
+    return [];
+  }
+};
 
-  // ✅ Firestore의 전체 문서를 삭제하는 함수 (Spark 요금제 쓰고 있어서... Export 마치면 지워줘야해 ㅠㅠ 엉엉)
+// ✅ Firestore에서 General 데이터 가져오기 (나머지 도메인)
+export const getGeneralSRRequests = async () => {
+  try {
+    const srCollection = collection(db, "sr_general_requests");
+    const querySnapshot = await getDocs(srCollection);
+    
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      data.push(doc.data());
+    });
+
+    console.log("📌 Firestore에서 가져온 General 데이터:", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Firestore General 데이터 가져오기 실패:", error);
+    return [];
+  }
+};
+
+// ✅ Firestore의 전체 문서를 삭제하는 함수 (Spark 요금제 쓰고 있어서... Export 마치면 지워줘야해 ㅠㅠ 엉엉)
 export const deleteAllDocuments = async (collectionName) => {
-    try {
-      const collectionRef = collection(db, collectionName);
-      const querySnapshot = await getDocs(collectionRef);
-  
-      let deletePromises = [];
-      querySnapshot.forEach((docItem) => {
-        deletePromises.push(deleteDoc(doc(db, collectionName, docItem.id)));
-      });
-  
-      await Promise.all(deletePromises);
-      console.log(`✅ Firestore 컬렉션 [${collectionName}] 전체 데이터 삭제 완료!`);
-      return true;
-    } catch (error) {
-      console.error(`❌ Firestore 컬렉션 [${collectionName}] 데이터 삭제 실패:`, error);
-      return false;
-    }
-  };
+  try {
+    const collectionRef = collection(db, collectionName);
+    const querySnapshot = await getDocs(collectionRef);
 
-  // ✅ Firestore에 새로운 개발 목록 추가 (Development.vue)
+    let deletePromises = [];
+    querySnapshot.forEach((docItem) => {
+      deletePromises.push(deleteDoc(doc(db, collectionName, docItem.id)));
+    });
+
+    await Promise.all(deletePromises);
+    console.log(`✅ Firestore 컬렉션 [${collectionName}] 전체 데이터 삭제 완료!`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Firestore 컬렉션 [${collectionName}] 데이터 삭제 실패:`, error);
+    return false;
+  }
+};
+
+// ✅ Firestore에 새로운 개발 목록 추가 (Development.vue)
 export const addDevelopmentCard = async (name, description) => {
-    try {
-      const newCardRef = doc(collection(db, "development_cards"));
-      const cardData = { name, description, serviceTypes: { ICC: 0, RPA: 0, EKMTC: 0 } };
-      await setDoc(newCardRef, cardData);
-      console.log("✅ Firestore에 개발 목록 추가 완료:", name);
-      return { id: newCardRef.id, ...cardData };
-    } catch (error) {
-      console.error("❌ Firestore 개발 목록 추가 실패:", error);
-      return null;
-    }
-  };
-  
+  try {
+    const newCardRef = doc(collection(db, "development_cards"));
+    const cardData = { name, description, serviceTypes: { ICC: 0, RPA: 0, EKMTC: 0 } };
+    await setDoc(newCardRef, cardData);
+    console.log("✅ Firestore에 개발 목록 추가 완료:", name);
+    return { id: newCardRef.id, ...cardData };
+  } catch (error) {
+    console.error("❌ Firestore 개발 목록 추가 실패:", error);
+    return null;
+  }
+};
 
 // ✅ Firestore에서 개발 카드 목록 가져오기
 export const getDevelopmentCards = async () => {
@@ -158,90 +155,113 @@ export const getDevelopmentCards = async () => {
     return [];
   }
 };
-  
-  // ✅ Firestore에서 특정 카드 삭제
-  export const deleteDevelopmentCard = async (cardId) => {
-    try {
-      await deleteDoc(doc(db, "development_cards", cardId));
-      console.log(`🗑️ Firestore에서 카드 삭제 완료: ${cardId}`);
-    } catch (error) {
-      console.error(`❌ Firestore 카드 삭제 실패:`, error);
-    }
-  };
-  
-  // ✅ Firestore에 선택된 SR을 특정 카드에 추가
-  export const addSRToCard = async (cardId, srList) => {
-    try {
-      console.log(`📌 [addSRToCard] 카드(${cardId})에 추가할 SR 리스트:`, srList);
-  
-      const srCollectionRef = collection(db, "development_cards", cardId, "sr_requests");
-  
-      for (const sr of srList) {
-        const docRef = await addDoc(srCollectionRef, sr);
-        console.log(`✅ Firestore에 SR 추가됨 (ID: ${docRef.id})`, sr);
-      }
-  
-      console.log("🎉 모든 SR이 Firestore에 정상적으로 추가됨!");
-      return true;
-    } catch (error) {
-      console.error("❌ Firestore에 SR 추가 실패:", error);
-      return false;
-    }
-  };
-  
 
-  // ✅ 특정 카드의 SR 요청 목록 가져오기
-  export const getCardSRRequests = async (cardId) => {
-    try {
-      const srCollectionRef = collection(db, "development_cards", cardId, "sr_requests"); // ✅ 서브컬렉션 가져오기
-      const srSnapshot = await getDocs(srCollectionRef);
-  
-      const srList = srSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-  
-      console.log(`📌 Firestore에서 카드(${cardId})의 SR 요청 불러옴:`, srList);
-      return srList;
-    } catch (error) {
-      console.error("❌ Firestore에서 카드의 SR 요청 불러오기 실패:", error);
-      return [];
-    }
-  };
+// ✅ Firestore에서 특정 카드 삭제
+export const deleteDevelopmentCard = async (cardId) => {
+  try {
+    await deleteDoc(doc(db, "development_cards", cardId));
+    console.log(`🗑️ Firestore에서 카드 삭제 완료: ${cardId}`);
+  } catch (error) {
+    console.error(`❌ Firestore 카드 삭제 실패:`, error);
+  }
+};
 
-  // ✅ 특정 카드에서 SR 요청 삭제
+// ✅ Firestore에 선택된 SR을 특정 카드에 추가
+export const addSRToCard = async (cardId, srList) => {
+  try {
+    console.log(`📌 [addSRToCard] 카드(${cardId})에 추가할 SR 리스트:`, srList);
+
+    const srCollectionRef = collection(db, "development_cards", cardId, "sr_requests");
+
+    for (const sr of srList) {
+      const docRef = await addDoc(srCollectionRef, sr);
+      console.log(`✅ Firestore에 SR 추가됨 (ID: ${docRef.id})`, sr);
+    }
+
+    console.log("🎉 모든 SR이 Firestore에 정상적으로 추가됨!");
+    return true;
+  } catch (error) {
+    console.error("❌ Firestore에 SR 추가 실패:", error);
+    return false;
+  }
+};
+
+// ✅ 특정 카드의 SR 요청 목록 가져오기
+export const getCardSRRequests = async (cardId) => {
+  try {
+    const srCollectionRef = collection(db, "development_cards", cardId, "sr_requests"); // ✅ 서브컬렉션 가져오기
+    const srSnapshot = await getDocs(srCollectionRef);
+
+    const srList = srSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    console.log(`📌 Firestore에서 카드(${cardId})의 SR 요청 불러옴:`, srList);
+    return srList;
+  } catch (error) {
+    console.error("❌ Firestore에서 카드의 SR 요청 불러오기 실패:", error);
+    return [];
+  }
+};
+
+// ✅ 특정 카드에서 SR 요청 삭제
 export const deleteSRFromCard = async (cardId, srId) => {
-    try {
-      const srRef = doc(db, "sr_cards", cardId, "sr_requests", srId);
-      await deleteDoc(srRef);
-      console.log(`✅ Firestore에서 카드 [${cardId}]의 SR 요청 [${srId}] 삭제 완료`);
-      return true;
-    } catch (error) {
-      console.error(`❌ Firestore 카드 [${cardId}] SR 요청 [${srId}] 삭제 실패:`, error);
-      return false;
-    }
-  };
+  try {
+    const srRef = doc(db, "development_cards", cardId, "sr_requests", srId); // 수정: 경로를 "development_cards"로 변경
+    await deleteDoc(srRef);
+    console.log(`✅ Firestore에서 카드 [${cardId}]의 SR 요청 [${srId}] 삭제 완료`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Firestore 카드 [${cardId}] SR 요청 [${srId}] 삭제 실패:`, error);
+    return false;
+  }
+};
 
-  // ✅ 특정 카드에서 SR 요청 제외 (제외된 목록으로 이동)
-export const excludeSRFromCard = async (cardId, srData) => {
-    try {
-      const excludeRef = doc(db, "sr_cards", cardId, "excluded_requests", srData.id.toString());
-      await setDoc(excludeRef, srData);
-      
-      // ✅ 기존 목록에서 제거
-      await deleteSRFromCard(cardId, srData.id);
-      
-      console.log(`✅ Firestore에서 카드 [${cardId}]의 SR 요청 [${srData.id}] 제외 완료`);
+// ✅ 특정 카드에서 모든 SR 요청 삭제 (신규 기능)
+export const deleteAllSRFromCard = async (cardId) => {
+  try {
+    const srCollectionRef = collection(db, "development_cards", cardId, "sr_requests");
+    const srSnapshot = await getDocs(srCollectionRef);
+
+    if (srSnapshot.empty) {
+      console.log(`✅ 카드 [${cardId}]에 삭제할 SR 요청이 없습니다.`);
       return true;
-    } catch (error) {
-      console.error(`❌ Firestore 카드 [${cardId}] SR 요청 [${srData.id}] 제외 실패:`, error);
-      return false;
     }
-  };
-  
-  
- // ✅ Firestore에 새로운 개발 카드 생성
- 
+
+    // Firestore Batch를 사용하여 일괄 삭제
+    const batch = writeBatch(db);
+    srSnapshot.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    console.log(`✅ Firestore에서 카드 [${cardId}]의 모든 SR 요청 삭제 완료`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Firestore 카드 [${cardId}]의 모든 SR 요청 삭제 실패:`, error);
+    return false;
+  }
+};
+
+// ✅ 특정 카드에서 SR 요청 제외 (제외된 목록으로 이동)
+export const excludeSRFromCard = async (cardId, srData) => {
+  try {
+    const excludeRef = doc(db, "development_cards", cardId, "excluded_requests", srData.id.toString());
+    await setDoc(excludeRef, srData);
+    
+    // ✅ 기존 목록에서 제거
+    await deleteSRFromCard(cardId, srData.id);
+    
+    console.log(`✅ Firestore에서 카드 [${cardId}]의 SR 요청 [${srData.id}] 제외 완료`);
+    return true;
+  } catch (error) {
+    console.error(`❌ Firestore 카드 [${cardId}] SR 요청 [${srData.id}] 제외 실패:`, error);
+    return false;
+  }
+};
+
+// ✅ Firestore에 새로운 개발 카드 생성
 export const createDevelopmentCard = async (cardData) => {
   try {
     const cardRef = doc(collection(db, "development_cards"), cardData.id);
@@ -259,7 +279,6 @@ export const createDevelopmentCard = async (cardData) => {
 };
 
 // ✅ Firestore에 SR 요청을 해당 카드의 서브컬렉션으로 저장
- 
 export const addSRRequestsToCard = async (cardId, srRequests) => {
   try {
     if (!cardId || srRequests.length === 0) {
@@ -283,7 +302,6 @@ export const addSRRequestsToCard = async (cardId, srRequests) => {
 };
 
 // ✅ Firestore에서 특정 개발 카드의 SR 요청 가져오기
- 
 export const getSRRequestsForCard = async (cardId) => {
   try {
     const cardRef = doc(db, "development_cards", cardId);
