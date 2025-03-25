@@ -43,8 +43,6 @@
   const password = ref('');
   const rememberMe = ref(false);
   const router = useRouter();
-  
-  // 사용자 정보 상태
   const user = ref(null);
   
   // provide를 사용하여 사용자 정보를 하위 컴포넌트에 전달
@@ -54,7 +52,7 @@
     try {
       console.log('📌 [Login2.vue] 로그인 시도:', email.value);
   
-      // Firebase Authentication으로 로그인
+      // Firebase Authentication으로 로그인 (관리자인 내가 콘솔에서 직접 등록해줘야 함.)
       const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
       const firebaseUser = userCredential.user;
       console.log('✅ [Login2.vue] 로그인 성공, UID:', firebaseUser.uid);

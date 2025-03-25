@@ -7,7 +7,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,  // ✅ Vue 환경 변수 방식
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,  // Vue3 환경 변수 방식
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
@@ -15,7 +15,7 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-console.log("📌 Firestore 환경 변수 확인:", firebaseConfig);  // ✅ 디버깅용 로그 추가
+console.log("📌 Firestore 환경 변수 확인:", firebaseConfig);  // 디버깅용 로그 추가
 
 const app = initializeApp(firebaseConfig); // 초기화
 const db = getFirestore(app); // DB 인스턴스

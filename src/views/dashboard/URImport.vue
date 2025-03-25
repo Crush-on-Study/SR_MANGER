@@ -118,7 +118,7 @@
       }));
   
       processedData.value = transformedData;
-      console.log("✅ 전처리된 데이터:", transformedData);
+    //   console.log("✅ 전처리된 데이터:", transformedData);
     };
     reader.readAsArrayBuffer(file);
   };

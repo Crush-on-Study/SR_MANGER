@@ -109,9 +109,11 @@ const handleAddToCard = async () => {
     const success = await addSRToCard(cardId, props.selectedSRs);
 
     if (success) {
-      console.log(`✅ 카드(${cardId})에 SR 추가 성공`);
+        alert(`✅ SR 추가 성공`);
+    //   console.log(`✅ 카드(${cardId})에 SR 추가 성공`);
     } else {
-      console.log(`❌ 카드(${cardId})에 SR 추가 실패`);
+        alert(`❌ SR 추가 실패`)
+    //   console.log(`❌ 카드(${cardId})에 SR 추가 실패`);
     }
   }
 
