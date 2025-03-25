@@ -2,14 +2,14 @@
 <template>
     <div class="pagination" v-if="totalPages > 1">
       <button @click="prevPage" :disabled="currentPage === 1">이전</button>
-      <span v-for="page in totalPages" :key="page">
-        <button
-          @click="goToPage(page)"
-          :class="{ active: currentPage === page }"
-        >
-          {{ page }}
-        </button>
-      </span>
+        <span v-for="page in displayedPages" :key="page">
+            <button
+                @click="goToPage(page)"
+                :class="{ active: currentPage === page }"
+            >
+                {{ page }}
+            </button>
+        </span>
       <button @click="nextPage" :disabled="currentPage === totalPages">다음</button>
     </div>
   </template>
