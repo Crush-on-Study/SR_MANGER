@@ -1,94 +1,140 @@
-<!-- src/components/widgets/Pagination.vue -->
 <template>
-    <div class="pagination" v-if="totalPages > 1">
-      <button @click="prevPage" :disabled="currentPage === 1">이전</button>
-        <span v-for="page in displayedPages" :key="page">
-            <button
-                @click="goToPage(page)"
-                :class="{ active: currentPage === page }"
-            >
-                {{ page }}
-            </button>
-        </span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">다음</button>
+  <div class="pagination-container">
+    <!-- 페이지당 항목 수 선택 -->
+    <div class="items-per-page">
+      <label>페이지당 항목 수: </label>
+      <select v-model="localItemsPerPage" @change="updateItemsPerPage">
+        <option :value="10">10</option>
+        <option :value="20">20</option>
+        <option :value="50">50</option>
+      </select>
     </div>
-  </template>
-  
-  <script setup>
-  import { computed } from 'vue';
-  
-  // Props 정의
-  const props = defineProps({
-    totalItems: {
-      type: Number,
-      required: true,
-    },
-    itemsPerPage: {
-      type: Number,
-      default: 20,
-    },
-    currentPage: {
-      type: Number,
-      required: true,
-    },
-  });
-  
-  // Emit 정의
-  const emit = defineEmits(['update:currentPage']);
-  
-  // 전체 페이지 수 계산
-  const totalPages = computed(() => Math.ceil(props.totalItems / props.itemsPerPage));
-  
-  // 페이지 이동 함수
-  const goToPage = (page) => {
-    if (page !== props.currentPage) {
-      emit('update:currentPage', page);
-    }
-  };
-  
-  const prevPage = () => {
-    if (props.currentPage > 1) {
-      emit('update:currentPage', props.currentPage - 1);
-    }
-  };
-  
-  const nextPage = () => {
-    if (props.currentPage < totalPages.value) {
-      emit('update:currentPage', props.currentPage + 1);
-    }
-  };
-  </script>
-  
-  <style scoped>
-  .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
+
+    <!-- 페이지네이션 버튼 -->
+    <div class="pagination-buttons">
+      <button :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">이전</button>
+      <button
+        v-for="page in totalPages"
+        :key="page"
+        :class="{ active: page === currentPage }"
+        @click="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+      <button :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">다음</button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, watch } from "vue";
+
+const props = defineProps({
+  totalItems: {
+    type: Number,
+    required: true,
+  },
+  itemsPerPage: {
+    type: Number,
+    default: 10,
+  },
+  currentPage: {
+    type: Number,
+    default: 1,
+  },
+});
+
+const emit = defineEmits(["update:currentPage", "update:itemsPerPage"]);
+
+const localItemsPerPage = ref(props.itemsPerPage);
+const localCurrentPage = ref(props.currentPage);
+
+// 총 페이지 수 계산
+const totalPages = computed(() => {
+  return Math.ceil(props.totalItems / localItemsPerPage.value) || 1;
+});
+
+// 페이지 변경
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    localCurrentPage.value = page;
+    emit("update:currentPage", page);
   }
-  
-  .pagination button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    background: #3498db;
-    color: white;
-    cursor: pointer;
-    transition: background 0.3s;
+};
+
+// 페이지당 항목 수 변경
+const updateItemsPerPage = () => {
+  emit("update:itemsPerPage", localItemsPerPage.value);
+  // 항목 수가 변경되면 첫 페이지로 이동
+  goToPage(1);
+};
+
+// 부모 컴포넌트의 currentPage 변경 감지
+watch(
+  () => props.currentPage,
+  (newPage) => {
+    localCurrentPage.value = newPage;
   }
-  
-  .pagination button:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
+);
+
+// 부모 컴포넌트의 itemsPerPage 변경 감지
+watch(
+  () => props.itemsPerPage,
+  (newItemsPerPage) => {
+    localItemsPerPage.value = newItemsPerPage;
   }
-  
-  .pagination button.active {
-    background: #2980b9;
-    font-weight: bold;
-  }
-  
-  .pagination button:hover:not(:disabled) {
-    background: #2980b9;
-  }
-  </style>
+);
+</script>
+
+<style scoped>
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 10px;
+  font-size: 14px;
+}
+
+.items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.items-per-page select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.pagination-buttons button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.pagination-buttons button:hover {
+  background: #f1f1f1;
+}
+
+.pagination-buttons button.active {
+  background: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.pagination-buttons button:disabled {
+  background: #f1f1f1;
+  color: #999;
+  cursor: not-allowed;
+}
+</style>

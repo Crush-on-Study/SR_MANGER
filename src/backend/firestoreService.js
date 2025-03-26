@@ -464,6 +464,19 @@ export const getSRRequestsForCard = async (cardId) => {
   }
 };
 
+// ✅ Firestore에서 SR 데이터 업데이트
+export const updateSR = async (srId, updatedData) => {
+  try {
+    const srDocRef = doc(db, "sr_requests", srId);
+    await updateDoc(srDocRef, updatedData);
+    console.log(`✅ SR(${srId}) 업데이트 성공:`, updatedData);
+    return true;
+  } catch (error) {
+    console.error(`❌ SR(${srId}) 업데이트 실패:`, error);
+    return false;
+  }
+};
+
 // ✅ SR의 Remark 업데이트 함수 (DetailModal.vue에서 사용)
 export const updateSRRemarks = async (collectionName, reqUno, remarks) => {
   try {

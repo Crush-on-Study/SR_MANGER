@@ -97,7 +97,6 @@ const handleCreate = async (formData) => {
     description: formData.description || "",
     applyingMonth: formData.applyingMonth,
     serviceTypes: formData.serviceTypes,
-    image: "https://via.placeholder.com/150", // 더미 이미지
     priorityCount: 0, // 초기값
     priorityHours: 0, // 초기값
   };
