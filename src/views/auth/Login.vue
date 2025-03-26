@@ -95,7 +95,7 @@
     align-items: center;
     width: 100vw;
     height: 100vh;
-    background: url('/src/assets/login_img.webp') no-repeat center center/cover;
+    background: url('/src/assets/login_img_test1.webp') no-repeat center center/cover;
   }
   
   .login-box {

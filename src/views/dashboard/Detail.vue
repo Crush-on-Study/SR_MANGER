@@ -182,11 +182,39 @@
   // ✅ Firestore에서 데이터 가져오기
   const fetchSRRequests = async () => {
     const data = await getCardSRRequests(cardId);
-    mainTableData.value = data.map(item => ({
-      ...item,
-      isComposite: item.serviceType.includes('+') // 복합 타입 여부 체크
-    }));
-    console.log(`📌 Firestore에서 카드 ${cardId}의 SR 요청 불러옴:`, mainTableData.value);
+  
+    // 디버깅: 가져온 데이터 확인
+    console.log("📌 Firestore에서 가져온 원본 데이터:", data);
+  
+    // 초기 데이터는 모두 메인 테이블에 표시
+    mainTableData.value = data
+      .filter(item => item && typeof item === "object") // 유효한 객체만 필터링
+      .map(item => {
+        const serviceType = item.PROGRAM_TYPE || ""; // Firestore 필드 이름에 맞게 수정
+        return {
+          id: item.id, // Firestore 문서 ID
+          ref_no: item.REQ_UNO || "N/A", // Firestore 필드 이름에 맞게 수정
+          title: item.REQ_TITLE || "",
+          domain: item.DOM_KND || "",
+          serviceType: item.PROGRAM_TYPE || "",
+          requestDate: item.REQ_DT || "",
+          estimatedHours: item.TOT_ESTM_TM || 0,
+          importance: item.MANDATORY || "",
+          isComposite: serviceType ? serviceType.includes("+") : false, // 복합 타입 여부 체크
+        };
+      });
+  
+    // 서브 테이블은 처음에는 비어 있음
+    iccTableData.value = [];
+    ekmtcTableData.value = [];
+    rpaTableData.value = [];
+  
+    console.log(`📌 Firestore에서 카드 ${cardId}의 SR 요청 불러옴:`, {
+      mainTableData: mainTableData.value,
+      iccTableData: iccTableData.value,
+      ekmtcTableData: ekmtcTableData.value,
+      rpaTableData: rpaTableData.value,
+    });
   };
   
   // ✅ 컴포넌트 마운트 시 Firestore 데이터 로드
@@ -219,7 +247,7 @@
     return table.some(item => item.ref_no === refNo);
   };
   
-  // ✅ SR 제외 (메인 테이블에서 서브테이블로 이동, Firestore 연동 제거)
+  // ✅ SR 제외 (메인 테이블에서 서브테이블로 이동)
   const excludeItem = (index, item) => {
     const excludedItem = { ...item };
     mainTableData.value.splice(index, 1);
@@ -240,7 +268,7 @@
     });
   };
   
-  // ✅ 서브테이블에서 메인 테이블로 추가 (Firestore 연동 제거)
+  // ✅ 서브테이블에서 메인 테이블로 추가
   const addToMain = (index, item, tableType) => {
     // 메인 테이블에 이미 존재하는지 확인
     if (isDuplicate(mainTableData.value, item.ref_no)) {
@@ -253,7 +281,7 @@
     if (item.isComposite) {
       const refNo = item.ref_no;
       const relatedItems = [];
-      
+  
       // 모든 서브테이블에서 동일한 ref_no를 가진 항목 수집
       iccTableData.value = iccTableData.value.filter(i => {
         if (i.ref_no === refNo) {

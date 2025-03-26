@@ -4,7 +4,7 @@
       <div class="footer-content">
         <p>Copyright © KMTC Digital Strategy Team</p>
         <p>Dev: HyunBin Kang  / PM: SeungMi Shin</p>
-        <p>Version 1.0</p>
+        <p>Version 1.1</p>
       </div>
     </footer>
   </template>
